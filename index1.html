@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Agate Industries Retailer | Modern</title>
+    <title>Agate Industries Retailer | Deploy Ready</title>
     <!-- Load Tailwind CSS from CDN for styling -->
     <script src="https://cdn.tailwindcss.com"></script>
     
@@ -13,12 +13,10 @@
             theme: {
                 extend: {
                     colors: {
-                        // Using a refreshing blue/teal as the new accent
                         'primary-accent': '#14b8a6', // teal-500
                         'soft-gray': '#f9fafb', // gray-50
                     },
                     fontFamily: {
-                        // Inter remains the primary font
                         sans: ['Inter', 'system-ui', 'sans-serif'],
                     },
                     boxShadow: {
@@ -30,65 +28,78 @@
         }
     </script>
 
-    <!-- Load React and Babel for running JSX in the browser -->
-    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- Load React and ReactDOM from Production CDNs (Minified) -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     
     <style>
-      /* Ensure clean typography */
+      /* Ensure clean typography and global animations for efficiency */
       body {
         font-family: 'Inter', sans-serif;
         background-color: #ffffff;
       }
-      /* Custom utility for the bright accent border */
-      .border-b-accent {
-        border-color: #14b8a6;
+      @keyframes slide-up {
+        from { transform: translateY(100%); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+      }
+      .animate-slide-up {
+        animation: slide-up 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      }
+      @keyframes fade-in {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+      .animate-fade-in {
+        animation: fade-in 0.6s ease-out forwards;
       }
     </style>
 </head>
 <body>
     <div id="root"></div>
 
-    <script type="text/babel">
-        // Using React's global object and hooks
+    <script type="module">
+        // Using React's global objects provided by the production CDNs
         const { useState, useEffect, useMemo } = React;
         
-        // --- Inline SVG Icon Components (Retained from previous version, styled for light mode) ---
+        // --- Inline SVG Icon Components (Functionally equivalent) ---
+        const Icon = ({ path, className, width = 24, height = 24, fill = 'none', stroke = 'currentColor', title = '', ...props }) => (
+            React.createElement('svg', { xmlns: "http://www.w3.org/2000/svg", width: width, height: height, viewBox: "0 0 24 24", fill: fill, stroke: stroke, strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", className: className, ...props },
+                title && React.createElement('title', null, title),
+                path.map((p, i) => React.createElement('path', { key: i, d: p }))
+            )
+        );
+
         const ShoppingBag = (props) => (
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+            Icon({ path: ["M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z", "M3 6h18", "M16 10a4 4 0 0 1-8 0"], width: 20, height: 20, ...props })
         );
         const ArrowRight = (props) => (
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+            Icon({ path: ["M5 12h14", "m12 5 7 7-7 7"], width: 16, height: 16, ...props })
         );
         const X = (props) => (
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M18 6 6 18"/><path d="m6 6 12 12"/><title>Close</title></svg>
+            Icon({ path: ["M18 6 6 18", "m6 6 12 12"], width: 16, height: 16, title: "Close", ...props })
         );
         const Heart = (props) => (
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+            Icon({ path: ["M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"], width: 20, height: 20, ...props })
         );
         const Check = (props) => (
-          <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M20 6 9 17l-5-5"/></svg>
+            Icon({ path: ["M20 6 9 17l-5-5"], width: 24, height: 24, ...props })
         );
         const CreditCard = (props) => (
-          <svg xmlns="http://www.w3.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" x2="23" y1="10" y2="10"/></svg>
+            Icon({ path: ["M1 4h22v16H1z", "M1 10h22"], width: 24, height: 24, ...props })
         );
         const Moon = (props) => (
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M12 3a6.364 6.364 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+            Icon({ path: ["M12 3a6.364 6.364 0 0 0 9 9 9 9 0 1 1-9-9Z"], width: 20, height: 20, ...props })
         );
         const Sun = (props) => (
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+            React.createElement('svg', { xmlns: "http://www.w3.org/2000/svg", width: "20", height: "20", viewBox: "0 0 24 24", fill: "currentColor", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", ...props },
+                React.createElement('circle', { cx: "12", cy: "12", r: "4" }),
+                React.createElement('path', { d: "M12 2v2" }), React.createElement('path', { d: "M12 20v2" }), React.createElement('path', { d: "m4.93 4.93 1.41 1.41" }), React.createElement('path', { d: "m17.66 17.66 1.41 1.41" }), React.createElement('path', { d: "M2 12h2" }), React.createElement('path', { d: "M20 12h2" }), React.createElement('path', { d: "m6.34 17.66-1.41 1.41" }), React.createElement('path', { d: "m19.07 4.93-1.41 1.41" })
+            )
         );
         const Search = (props) => (
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            Icon({ path: ["M11 11a8 8 0 1 0 0 16", "m21 21-4.3-4.3"], width: 16, height: 16, ...props })
         );
-        const Activity = (props) => (
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
-        );
-        const Grid = (props) => (
-          <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" x2="21" y1="12" y2="12"/><line x1="12" x2="12" y1="3" y2="21"/></svg>
-        );
-        
+
         // --- Mock Data (Retained) ---
         const PRODUCTS = [
           {
@@ -192,10 +203,9 @@
           }).format(amount).replace('GHS', '₵');
         };
 
-        // --- Components ---
+        // --- Components (Converted from JSX to React.createElement) ---
 
         const Button = ({ children, variant = 'primary', className = '', onClick, icon: Icon, ...props }) => {
-          // Clean, modern, and light styling with soft corners and subtle shadow
           const baseStyle = "group relative flex items-center justify-center gap-2 px-6 py-3 font-medium text-sm tracking-wide rounded-lg transition-all duration-300 active:translate-y-0.5 shadow-soft";
           
           const variants = {
@@ -205,92 +215,79 @@
             accent: "bg-primary-accent text-white font-bold hover:bg-teal-600 focus:ring-4 focus:ring-primary-accent/50"
           };
 
-          return (
-            <button className={`${baseStyle} ${variants[variant]} ${className}`} onClick={onClick} {...props}>
-              {Icon && <Icon size={16} className="relative z-10" />}
-              <span className="relative z-10">{children}</span>
-            </button>
+          return React.createElement('button', { 
+            className: `${baseStyle} ${variants[variant]} ${className}`, 
+            onClick: onClick, 
+            ...props 
+          }, 
+            Icon && React.createElement(Icon, { size: 16, className: "relative z-10" }),
+            React.createElement('span', { className: "relative z-10" }, children)
           );
         };
 
         const ProductCard = ({ product, onClick, onAddToCart }) => (
-          <div className="group relative bg-white border border-gray-100 rounded-xl shadow-lg-soft overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 flex flex-col h-full">
-            
-            <div className="relative aspect-[4/5] bg-soft-gray overflow-hidden">
-              <img
-                src={product.image}
-                alt={product.name}
-                // Image effect changed to simple hover zoom
-                className="w-full h-full object-cover transition-transform duration-500 scale-100 group-hover:scale-105"
-                onError={(e) => { e.target.onerror = null; e.target.src = "https://placehold.co/800x1000/F4F4F5/A1A1AA?text=AGATE"; }}
-              />
-              
-              {/* Quick Add Overlay Button - visible on hover */}
-              <div className="absolute inset-0 flex items-end justify-center bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                <Button
-                  variant="primary"
-                  className="mb-4 px-8 py-2 text-xs font-semibold uppercase tracking-wider translate-y-2 group-hover:translate-y-0"
-                  onClick={(e) => { e.stopPropagation(); onAddToCart(product); }}
-                  icon={ShoppingBag}
-                >
-                  Quick Add
-                </Button>
-              </div>
-            </div>
-
-            <div className="p-4 flex-1 flex flex-col gap-1">
-              <div className="flex justify-between items-center text-xs text-gray-500 mb-2">
-                <span className="uppercase tracking-wider text-primary-accent">{product.category.replace('_', ' ')}</span>
-                <div className="flex items-center gap-1">
-                   <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-amber-400"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                   <span className="text-sm font-medium">{product.rating}</span>
-                </div>
-              </div>
-              
-              <h3 
-                onClick={() => onClick(product)} 
-                className="font-bold text-lg tracking-tight cursor-pointer hover:text-primary-accent transition-colors"
-              >
-                {product.name}
-              </h3>
-              
-              <div className="mt-2 pt-2 flex items-end justify-between border-t border-gray-100">
-                <span className="text-xl font-semibold text-gray-900">
-                  {formatCurrency(product.price)}
-                </span>
-                <button 
-                    onClick={() => onClick(product)} 
-                    className="p-2 text-gray-400 hover:text-primary-accent transition-colors"
-                    title="View details"
-                >
-                   <ArrowRight width={18} height={18} />
-                </button>
-              </div>
-            </div>
-          </div>
+            React.createElement('div', { className: "group relative bg-white border border-gray-100 rounded-xl shadow-lg-soft overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 flex flex-col h-full" },
+                React.createElement('div', { className: "relative aspect-[4/5] bg-soft-gray overflow-hidden" },
+                    React.createElement('img', {
+                        src: product.image,
+                        alt: product.name,
+                        className: "w-full h-full object-cover transition-transform duration-500 scale-100 group-hover:scale-105",
+                        onError: (e) => { e.target.onerror = null; e.target.src = "https://placehold.co/800x1000/F4F4F5/A1A1AA?text=AGATE"; }
+                    }),
+                    React.createElement('div', { className: "absolute inset-0 flex items-end justify-center bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" },
+                        React.createElement(Button, {
+                            variant: "primary",
+                            className: "mb-4 px-8 py-2 text-xs font-semibold uppercase tracking-wider translate-y-2 group-hover:translate-y-0",
+                            onClick: (e) => { e.stopPropagation(); onAddToCart(product); },
+                            icon: ShoppingBag
+                        }, "Quick Add")
+                    )
+                ),
+                React.createElement('div', { className: "p-4 flex-1 flex flex-col gap-1" },
+                    React.createElement('div', { className: "flex justify-between items-center text-xs text-gray-500 mb-2" },
+                        React.createElement('span', { className: "uppercase tracking-wider text-primary-accent" }, product.category.replace('_', ' ')),
+                        React.createElement('div', { className: "flex items-center gap-1" },
+                            React.createElement('svg', { xmlns: "http://www.w3.org/2000/svg", width: "12", height: "12", viewBox: "0 0 24 24", fill: "currentColor", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", className: "text-amber-400" },
+                                React.createElement('polygon', { points: "12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" })
+                            ),
+                            React.createElement('span', { className: "text-sm font-medium" }, product.rating)
+                        )
+                    ),
+                    React.createElement('h3', {
+                        onClick: () => onClick(product),
+                        className: "font-bold text-lg tracking-tight cursor-pointer hover:text-primary-accent transition-colors"
+                    }, product.name),
+                    React.createElement('div', { className: "mt-2 pt-2 flex items-end justify-between border-t border-gray-100" },
+                        React.createElement('span', { className: "text-xl font-semibold text-gray-900" }, formatCurrency(product.price)),
+                        React.createElement('button', {
+                            onClick: () => onClick(product),
+                            className: "p-2 text-gray-400 hover:text-primary-accent transition-colors",
+                            title: "View details"
+                        }, React.createElement(ArrowRight, { width: 18, height: 18 }))
+                    )
+                )
+            )
         );
 
         const Notification = ({ message, show, onClose }) => {
           if (!show) return null;
-          // Soft, rounded notification design
-          return (
-            <div className="fixed bottom-6 right-6 z-50 animate-slide-up">
-              <div className="bg-white text-gray-900 px-6 py-4 rounded-xl shadow-2xl border-l-4 border-primary-accent flex items-center gap-4 min-w-[300px]">
-                <ShoppingBag className="text-primary-accent" />
-                <div className="flex-1">
-                  <h4 className="font-semibold text-sm mb-0.5 text-primary-accent">Item Added</h4>
-                  <p className="text-sm">{message}</p>
-                </div>
-                <button onClick={onClose} className="text-gray-400 hover:text-gray-900"><X width={16} height={16} /></button>
-              </div>
-            </div>
+          return React.createElement('div', { className: "fixed bottom-6 right-6 z-50 animate-slide-up" },
+            React.createElement('div', { className: "bg-white text-gray-900 px-6 py-4 rounded-xl shadow-2xl border-l-4 border-primary-accent flex items-center gap-4 min-w-[300px]" },
+                React.createElement(ShoppingBag, { className: "text-primary-accent" }),
+                React.createElement('div', { className: "flex-1" },
+                    React.createElement('h4', { className: "font-semibold text-sm mb-0.5 text-primary-accent" }, "Item Added"),
+                    React.createElement('p', { className: "text-sm" }, message)
+                ),
+                React.createElement('button', { onClick: onClose, className: "text-gray-400 hover:text-gray-900" },
+                    React.createElement(X, { width: 16, height: 16 })
+                )
+            )
           );
         };
 
         // --- Main App ---
 
         function App() {
-          // Defaulting to light mode (no dark mode class on HTML)
           const [darkMode, setDarkMode] = useState(false); 
           const [view, setView] = useState('home'); 
           const [activeProduct, setActiveProduct] = useState(null);
@@ -300,7 +297,6 @@
           const [selectedCategory, setSelectedCategory] = useState("ALL_PRODUCTS");
           const [toast, setToast] = useState({ show: false, message: '' });
 
-          // Effect to manage the dark mode class on the HTML element
           useEffect(() => {
             if (darkMode) {
               document.documentElement.classList.add('dark');
@@ -308,6 +304,19 @@
               document.documentElement.classList.remove('dark');
             }
           }, [darkMode]);
+
+          const updateQuantity = (id, change) => {
+            setCart(prevCart => prevCart.map(item => {
+                if (item.id === id) {
+                    const newQuantity = item.quantity + change;
+                    if (newQuantity <= 0) {
+                        return null; // Flag for removal
+                    }
+                    return { ...item, quantity: newQuantity };
+                }
+                return item;
+            }).filter(Boolean)); // Filter out null items
+          };
 
           const cartTotal = useMemo(() => 
             cart.reduce((sum, item) => sum + (item.price * item.quantity), 0), 
@@ -351,315 +360,270 @@
             window.scrollTo(0, 0);
           };
 
-          // --- Layout Components ---
+          // --- Layout Components (Converted) ---
 
           const Navbar = () => (
-            <nav className="sticky top-0 z-40 bg-white shadow-lg-soft">
-              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex items-center justify-between h-20">
-                  
-                  {/* Logo - Simple and clean */}
-                  <div className="flex-shrink-0 cursor-pointer flex items-center gap-2 group" onClick={() => setView('home')}>
-                    <ShoppingBag className="text-primary-accent w-6 h-6" />
-                    <span className="font-bold text-2xl tracking-tight text-gray-900">AGATE</span>
-                    <span className="text-xs text-gray-500 uppercase">Retail</span>
-                  </div>
-
-                  {/* Search Bar - Desktop and Mobile adaptive */}
-                  <div className="flex-1 flex justify-center mx-4 md:mx-12">
-                    <div className="relative w-full max-w-lg">
-                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <Search className="text-gray-400" />
-                      </div>
-                      <input
-                        type="text"
-                        placeholder="Search products..."
-                        className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-full bg-soft-gray text-gray-900 text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-accent focus:border-primary-accent transition-all"
-                        value={searchQuery}
-                        onChange={(e) => {
-                          setSearchQuery(e.target.value);
-                          if (view !== 'home') setView('home');
-                        }}
-                      />
-                    </div>
-                  </div>
-
-                  {/* Actions */}
-                  <div className="flex items-center gap-2 sm:gap-4">
-                    <button 
-                      onClick={() => setDarkMode(!darkMode)}
-                      className="p-2 text-gray-500 hover:text-primary-accent transition-colors rounded-full hover:bg-gray-100"
-                      title="Toggle Theme"
-                    >
-                      {/* Icon uses Moon/Sun components */}
-                      {darkMode ? <Sun width={20} height={20} className="text-primary-accent" /> : <Moon width={20} height={20} />}
-                    </button>
-                    
-                    <button 
-                      className="relative p-2 text-gray-500 hover:text-primary-accent transition-colors rounded-full hover:bg-gray-100"
-                      onClick={() => setIsCartOpen(true)}
-                      title="View Cart"
-                    >
-                      {/* ShoppingBag icon uses component */}
-                      <ShoppingBag width={20} height={20} />
-                      {cartCount > 0 && (
-                         <span className="absolute -top-0 -right-0 inline-flex items-center justify-center w-5 h-5 text-xs font-semibold text-white bg-red-500 rounded-full">
-                           {cartCount}
-                         </span>
-                      )}
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </nav>
+            React.createElement('nav', { className: "sticky top-0 z-40 bg-white shadow-lg-soft" },
+                React.createElement('div', { className: "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" },
+                    React.createElement('div', { className: "flex items-center justify-between h-20" },
+                        React.createElement('div', { 
+                            className: "flex-shrink-0 cursor-pointer flex items-center gap-2 group", 
+                            onClick: () => { setView('home'); setSearchQuery(''); } 
+                        },
+                            React.createElement(ShoppingBag, { className: "text-primary-accent w-6 h-6" }),
+                            React.createElement('span', { className: "font-bold text-2xl tracking-tight text-gray-900" }, "AGATE"),
+                            React.createElement('span', { className: "text-xs text-gray-500 uppercase" }, "Retail")
+                        ),
+                        React.createElement('div', { className: "flex-1 flex justify-center mx-4 md:mx-12" },
+                            React.createElement('div', { className: "relative w-full max-w-lg" },
+                                React.createElement('div', { className: "absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none" },
+                                    React.createElement(Search, { className: "text-gray-400" })
+                                ),
+                                React.createElement('input', {
+                                    type: "text",
+                                    placeholder: "Search products...",
+                                    className: "block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-full bg-soft-gray text-gray-900 text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-accent focus:border-primary-accent transition-all",
+                                    value: searchQuery,
+                                    onChange: (e) => {
+                                        setSearchQuery(e.target.value);
+                                        if (view !== 'home') setView('home');
+                                    }
+                                })
+                            )
+                        ),
+                        React.createElement('div', { className: "flex items-center gap-2 sm:gap-4" },
+                            React.createElement('button', {
+                                onClick: () => setDarkMode(!darkMode),
+                                className: "p-2 text-gray-500 hover:text-primary-accent transition-colors rounded-full hover:bg-gray-100",
+                                title: "Toggle Theme"
+                            }, 
+                                darkMode 
+                                    ? React.createElement(Sun, { width: 20, height: 20, className: "text-primary-accent" }) 
+                                    : React.createElement(Moon, { width: 20, height: 20 })
+                            ),
+                            React.createElement('button', {
+                                className: "relative p-2 text-gray-500 hover:text-primary-accent transition-colors rounded-full hover:bg-gray-100",
+                                onClick: () => setIsCartOpen(true),
+                                title: "View Cart"
+                            },
+                                React.createElement(ShoppingBag, { width: 20, height: 20 }),
+                                cartCount > 0 && 
+                                React.createElement('span', { className: "absolute -top-0 -right-0 inline-flex items-center justify-center w-5 h-5 text-xs font-semibold text-white bg-red-500 rounded-full" }, cartCount)
+                            )
+                        )
+                    )
+                )
+            )
           );
 
           const CartDrawer = () => (
-            <div className={`fixed inset-0 z-50 overflow-hidden ${isCartOpen ? '' : 'pointer-events-none'}`}>
-              <div 
-                className={`absolute inset-0 bg-black/30 backdrop-blur-sm transition-opacity duration-300 ${isCartOpen ? 'opacity-100' : 'opacity-0'}`} 
-                onClick={() => setIsCartOpen(false)}
-              />
-              <div className={`absolute inset-y-0 right-0 max-w-sm w-full flex pl-10 transform transition-transform duration-300 ${isCartOpen ? 'translate-x-0' : 'translate-x-full'}`}>
-                <div className="w-full flex flex-col h-full bg-white shadow-xl">
-                  
-                  <div className="flex items-center justify-between px-6 py-5 border-b border-gray-200 bg-soft-gray">
-                    <h2 className="text-xl font-bold tracking-tight text-gray-900">Your Shopping Cart ({cartCount})</h2>
-                    <button onClick={() => setIsCartOpen(false)} className="text-gray-400 hover:text-gray-900 p-2">
-                      <X width={24} height={24} />
-                    </button>
-                  </div>
-
-                  <div className="flex-1 overflow-y-auto p-6">
-                    {cart.length === 0 ? (
-                      <div className="h-full flex flex-col items-center justify-center text-center space-y-4 text-gray-500">
-                        <ShoppingBag width={32} height={32} className="opacity-50" />
-                        <p className="text-sm">Your cart is currently empty.</p>
-                        <Button variant="ghost" onClick={() => setIsCartOpen(false)}>Continue Shopping</Button>
-                      </div>
-                    ) : (
-                      <div className="space-y-4">
-                        {cart.map(item => (
-                          <div key={item.id} className="py-2 flex border-b border-dashed border-gray-100 last:border-b-0">
-                            <div className="flex-shrink-0 w-20 h-20 bg-gray-100 rounded-lg overflow-hidden border border-gray-200">
-                              <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
-                            </div>
-                            <div className="ml-4 flex-1 flex flex-col justify-between">
-                              <div className="flex justify-between items-start">
-                                <h3 className="text-sm font-semibold text-gray-900 hover:text-primary-accent">{item.name}</h3>
-                                <p className="text-sm font-medium text-gray-900">{formatCurrency(item.price * item.quantity)}</p>
-                              </div>
-                              <div className="flex items-center justify-between mt-2">
-                                <div className="flex items-center space-x-2 border border-gray-200 rounded-lg">
-                                  <button onClick={() => updateQuantity(item.id, -1)} className="p-1.5 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-l-lg text-sm transition-colors">
-                                    -
-                                  </button>
-                                  <span className="text-sm font-medium w-4 text-center">{item.quantity}</span>
-                                  <button onClick={() => updateQuantity(item.id, 1)} className="p-1.5 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-r-lg text-sm transition-colors">
-                                    +
-                                  </button>
-                                </div>
-                                <button type="button" onClick={() => removeFromCart(item.id)} className="text-xs font-medium text-red-500 hover:text-red-700">
-                                  Remove
-                                </button>
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-
-                  {cart.length > 0 && (
-                    <div className="border-t border-gray-200 px-6 py-6 bg-soft-gray">
-                      <div className="flex justify-between text-base font-medium text-gray-900 mb-4">
-                        <p>Subtotal</p>
-                        <p>{formatCurrency(cartTotal)}</p>
-                      </div>
-                      <Button 
-                        variant="primary" 
-                        className="w-full py-3" 
-                        onClick={() => { setIsCartOpen(false); setView('checkout'); }}
-                        icon={ArrowRight}
-                      >
-                        Proceed to Checkout 
-                      </Button>
-                      <Button variant="ghost" className="w-full mt-2" onClick={() => setIsCartOpen(false)}>
-                        Continue Shopping
-                      </Button>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
+            React.createElement('div', { className: `fixed inset-0 z-50 overflow-hidden ${isCartOpen ? '' : 'pointer-events-none'}` },
+                React.createElement('div', {
+                    className: `absolute inset-0 bg-black/30 backdrop-blur-sm transition-opacity duration-300 ${isCartOpen ? 'opacity-100' : 'opacity-0'}`,
+                    onClick: () => setIsCartOpen(false)
+                }),
+                React.createElement('div', { className: `absolute inset-y-0 right-0 max-w-sm w-full flex pl-10 transform transition-transform duration-300 ${isCartOpen ? 'translate-x-0' : 'translate-x-full'}` },
+                    React.createElement('div', { className: "w-full flex flex-col h-full bg-white shadow-xl" },
+                        React.createElement('div', { className: "flex items-center justify-between px-6 py-5 border-b border-gray-200 bg-soft-gray" },
+                            React.createElement('h2', { className: "text-xl font-bold tracking-tight text-gray-900" }, `Your Shopping Cart (${cartCount})`),
+                            React.createElement('button', { onClick: () => setIsCartOpen(false), className: "text-gray-400 hover:text-gray-900 p-2" },
+                                React.createElement(X, { width: 24, height: 24 })
+                            )
+                        ),
+                        React.createElement('div', { className: "flex-1 overflow-y-auto p-6" },
+                            cart.length === 0 ? (
+                                React.createElement('div', { className: "h-full flex flex-col items-center justify-center text-center space-y-4 text-gray-500" },
+                                    React.createElement(ShoppingBag, { width: 32, height: 32, className: "opacity-50" }),
+                                    React.createElement('p', { className: "text-sm" }, "Your cart is currently empty."),
+                                    React.createElement(Button, { variant: "ghost", onClick: () => setIsCartOpen(false) }, "Continue Shopping")
+                                )
+                            ) : (
+                                React.createElement('div', { className: "space-y-4" },
+                                    cart.map(item => (
+                                        React.createElement('div', { key: item.id, className: "py-2 flex border-b border-dashed border-gray-100 last:border-b-0" },
+                                            React.createElement('div', { className: "flex-shrink-0 w-20 h-20 bg-gray-100 rounded-lg overflow-hidden border border-gray-200" },
+                                                React.createElement('img', { src: item.image, alt: item.name, className: "w-full h-full object-cover" })
+                                            ),
+                                            React.createElement('div', { className: "ml-4 flex-1 flex flex-col justify-between" },
+                                                React.createElement('div', { className: "flex justify-between items-start" },
+                                                    React.createElement('h3', { className: "text-sm font-semibold text-gray-900 hover:text-primary-accent" }, item.name),
+                                                    React.createElement('p', { className: "text-sm font-medium text-gray-900" }, formatCurrency(item.price * item.quantity))
+                                                ),
+                                                React.createElement('div', { className: "flex items-center justify-between mt-2" },
+                                                    React.createElement('div', { className: "flex items-center space-x-2 border border-gray-200 rounded-lg" },
+                                                        React.createElement('button', { onClick: () => updateQuantity(item.id, -1), className: "p-1.5 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-l-lg text-sm transition-colors" }, "–"),
+                                                        React.createElement('span', { className: "text-sm font-medium w-4 text-center" }, item.quantity),
+                                                        React.createElement('button', { onClick: () => updateQuantity(item.id, 1), className: "p-1.5 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-r-lg text-sm transition-colors" }, "+")
+                                                    ),
+                                                    React.createElement('button', { type: "button", onClick: () => removeFromCart(item.id), className: "text-xs font-medium text-red-500 hover:text-red-700" }, "Remove")
+                                                )
+                                            )
+                                        )
+                                    ))
+                                )
+                            )
+                        ),
+                        cart.length > 0 &&
+                        React.createElement('div', { className: "border-t border-gray-200 px-6 py-6 bg-soft-gray" },
+                            React.createElement('div', { className: "flex justify-between text-base font-medium text-gray-900 mb-4" },
+                                React.createElement('p', null, "Subtotal"),
+                                React.createElement('p', null, formatCurrency(cartTotal))
+                            ),
+                            React.createElement(Button, {
+                                variant: "primary",
+                                className: "w-full py-3",
+                                onClick: () => { setIsCartOpen(false); setView('checkout'); },
+                                icon: ArrowRight
+                            }, "Proceed to Checkout"),
+                            React.createElement(Button, { variant: "ghost", className: "w-full mt-2", onClick: () => setIsCartOpen(false) }, "Continue Shopping")
+                        )
+                    )
+                )
+            )
           );
 
           const Hero = () => (
-            <div className="relative overflow-hidden bg-soft-gray border-b border-gray-200">
-              <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-28">
-                <div className="lg:grid lg:grid-cols-12 lg:gap-16 items-center">
-                  <div className="sm:text-center md:max-w-2xl md:mx-auto lg:col-span-6 lg:text-left relative z-10">
-                    <div className="inline-flex items-center gap-2 px-3 py-1 bg-teal-100 text-teal-600 text-xs font-medium rounded-full mb-6">
-                      <span className="w-1.5 h-1.5 bg-teal-500 rounded-full animate-pulse"></span>
-                      Spring/Summer Collection
-                    </div>
-                    <h1 className="text-5xl sm:text-6xl font-extrabold tracking-tight text-gray-900 mb-6">
-                      Engineered for <span className="text-primary-accent">Modern Life</span>.
-                    </h1>
-                    <p className="mt-4 text-lg text-gray-600 max-w-lg">
-                      Discover Agate Industries' curated collection of high-performance electronics, apparel, and lifestyle tools designed for durability and seamless integration.
-                    </p>
-                    <div className="mt-10 flex flex-col sm:flex-row gap-4">
-                      <Button onClick={() => document.getElementById('products').scrollIntoView({ behavior: 'smooth' })} className="py-3">
-                        Shop Now
-                      </Button>
-                      <Button variant="secondary" onClick={() => setView('about')} className="py-3">
-                        Learn More
-                      </Button>
-                    </div>
-                  </div>
-                  <div className="mt-12 lg:mt-0 lg:col-span-6 relative">
-                    <div className="relative mx-auto w-full max-w-md p-4 bg-white rounded-2xl shadow-xl">
-                       <img
-                          className="w-full aspect-square object-cover rounded-xl"
-                          src="https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=800&q=80"
-                          alt="Hero product showcase"
-                        />
-                       <div className="absolute bottom-10 left-10 p-3 bg-white/80 backdrop-blur-sm rounded-lg shadow-md">
-                          <p className="text-xs text-gray-500 font-medium">Starting at</p>
-                          <p className="text-2xl font-bold text-gray-900">{formatCurrency(1350.00)}</p>
-                       </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+            React.createElement('div', { className: "relative overflow-hidden bg-soft-gray border-b border-gray-200" },
+                React.createElement('div', { className: "relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-28" },
+                    React.createElement('div', { className: "lg:grid lg:grid-cols-12 lg:gap-16 items-center" },
+                        React.createElement('div', { className: "sm:text-center md:max-w-2xl md:mx-auto lg:col-span-6 lg:text-left relative z-10" },
+                            React.createElement('div', { className: "inline-flex items-center gap-2 px-3 py-1 bg-teal-100 text-teal-600 text-xs font-medium rounded-full mb-6" },
+                                React.createElement('span', { className: "w-1.5 h-1.5 bg-teal-500 rounded-full animate-pulse" }),
+                                "Spring/Summer Collection"
+                            ),
+                            React.createElement('h1', { className: "text-5xl sm:text-6xl font-extrabold tracking-tight text-gray-900 mb-6" },
+                                "Engineered for ",
+                                React.createElement('span', { className: "text-primary-accent" }, "Modern Life"),
+                                "."
+                            ),
+                            React.createElement('p', { className: "mt-4 text-lg text-gray-600 max-w-lg" }, "Discover Agate Industries' curated collection of high-performance electronics, apparel, and lifestyle tools designed for durability and seamless integration."),
+                            React.createElement('div', { className: "mt-10 flex flex-col sm:flex-row gap-4" },
+                                React.createElement(Button, { onClick: () => document.getElementById('products').scrollIntoView({ behavior: 'smooth' }), className: "py-3" }, "Shop Now"),
+                                React.createElement(Button, { variant: "secondary", onClick: () => setView('about'), className: "py-3" }, "Learn More")
+                            )
+                        ),
+                        React.createElement('div', { className: "mt-12 lg:mt-0 lg:col-span-6 relative" },
+                            React.createElement('div', { className: "relative mx-auto w-full max-w-md p-4 bg-white rounded-2xl shadow-xl" },
+                                React.createElement('img', {
+                                    className: "w-full aspect-square object-cover rounded-xl",
+                                    src: "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=800&q=80",
+                                    alt: "Hero product showcase"
+                                }),
+                                React.createElement('div', { className: "absolute bottom-10 left-10 p-3 bg-white/80 backdrop-blur-sm rounded-lg shadow-md" },
+                                    React.createElement('p', { className: "text-xs text-gray-500 font-medium" }, "Starting at"),
+                                    React.createElement('p', { className: "text-2xl font-bold text-gray-900" }, formatCurrency(1350.00))
+                                )
+                            )
+                        )
+                    )
+                )
+            )
           );
 
           const ProductList = () => (
-            <div id="products" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 bg-white min-h-screen">
-              
-              <div className="flex flex-col md:flex-row md:items-end md:justify-between mb-12 gap-6 border-b border-gray-100 pb-6">
-                <div>
-                  <h2 className="text-3xl font-extrabold tracking-tight text-gray-900 mb-2">Our Collection</h2>
-                  <p className="text-base text-gray-500">Curated tools for your everyday life.</p>
-                </div>
-                
-                {/* Categories - Pill style buttons */}
-                <div className="flex flex-wrap gap-2">
-                  {CATEGORIES.map(cat => (
-                    <button
-                      key={cat}
-                      onClick={() => setSelectedCategory(cat)}
-                      className={`px-4 py-2 text-xs font-semibold rounded-full transition-all ${
-                        selectedCategory === cat 
-                          ? 'bg-primary-accent text-white shadow-md' 
-                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                      }`}
-                    >
-                      {cat.replace('_', ' ')}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {filteredProducts.length === 0 ? (
-                <div className="text-center py-24 bg-soft-gray rounded-xl shadow-inner">
-                  <Search width={48} height={48} className="mx-auto text-gray-300 mb-4" />
-                  <p className="text-lg font-semibold text-gray-700">No products found.</p>
-                  <p className="text-sm text-gray-500 mt-2">Try adjusting your search or filters.</p>
-                  <Button variant="ghost" onClick={() => {setSearchQuery(''); setSelectedCategory('ALL_PRODUCTS');}} className="mt-6">
-                    Clear Filters
-                  </Button>
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-                  {filteredProducts.map(product => (
-                    <ProductCard 
-                      key={product.id} 
-                      product={product} 
-                      onClick={navigateToProduct}
-                      onAddToCart={addToCart}
-                    />
-                  ))}
-                </div>
-              )}
-            </div>
+            React.createElement('div', { id: "products", className: "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 bg-white min-h-screen" },
+                React.createElement('div', { className: "flex flex-col md:flex-row md:items-end md:justify-between mb-12 gap-6 border-b border-gray-100 pb-6" },
+                    React.createElement('div', null,
+                        React.createElement('h2', { className: "text-3xl font-extrabold tracking-tight text-gray-900 mb-2" }, "Our Collection"),
+                        React.createElement('p', { className: "text-base text-gray-500" }, "Curated tools for your everyday life.")
+                    ),
+                    React.createElement('div', { className: "flex flex-wrap gap-2" },
+                        CATEGORIES.map(cat =>
+                            React.createElement('button', {
+                                key: cat,
+                                onClick: () => setSelectedCategory(cat),
+                                className: `px-4 py-2 text-xs font-semibold rounded-full transition-all ${
+                                    selectedCategory === cat
+                                        ? 'bg-primary-accent text-white shadow-md'
+                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                }`
+                            }, cat.replace('_', ' '))
+                        )
+                    )
+                ),
+                filteredProducts.length === 0 ? (
+                    React.createElement('div', { className: "text-center py-24 bg-soft-gray rounded-xl shadow-inner" },
+                        React.createElement(Search, { width: 48, height: 48, className: "mx-auto text-gray-300 mb-4" }),
+                        React.createElement('p', { className: "text-lg font-semibold text-gray-700" }, "No products found."),
+                        React.createElement('p', { className: "text-sm text-gray-500 mt-2" }, "Try adjusting your search or filters."),
+                        React.createElement(Button, { variant: "ghost", onClick: () => { setSearchQuery(''); setSelectedCategory('ALL_PRODUCTS'); }, className: "mt-6" }, "Clear Filters")
+                    )
+                ) : (
+                    React.createElement('div', { className: "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8" },
+                        filteredProducts.map(product =>
+                            React.createElement(ProductCard, {
+                                key: product.id,
+                                product: product,
+                                onClick: navigateToProduct,
+                                onAddToCart: addToCart
+                            })
+                        )
+                    )
+                )
+            )
           );
 
           const ProductDetailView = () => (
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 animate-fade-in">
-              <div className="mb-6 text-sm text-gray-500">
-                 <span onClick={() => setView('home')} className="cursor-pointer hover:text-primary-accent">Home</span>
-                 <span className="mx-2">/</span>
-                 <span className="uppercase">{activeProduct.category.replace('_', ' ')}</span>
-                 <span className="mx-2">/</span>
-                 <span className="text-gray-900 font-medium">{activeProduct.name}</span>
-              </div>
-
-              <div className="lg:grid lg:grid-cols-12 lg:gap-16">
-                {/* Main Image Area */}
-                <div className="lg:col-span-7 flex flex-col gap-4">
-                  <div className="relative aspect-square bg-soft-gray rounded-xl overflow-hidden shadow-lg-soft">
-                    <img src={activeProduct.image} alt={activeProduct.name} className="w-full h-full object-cover object-center" />
-                  </div>
-                  
-                  <div className="grid grid-cols-4 gap-4">
-                    {[1,2,3,4].map(i => (
-                      <div key={i} className="aspect-square border-2 border-transparent hover:border-primary-accent transition-colors rounded-lg bg-soft-gray cursor-pointer p-1">
-                        <img src={activeProduct.image} alt="" className="w-full h-full object-cover rounded" />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Product Spec Sheet */}
-                <div className="lg:col-span-5 mt-10 lg:mt-0 flex flex-col">
-                  <div className="border-b border-gray-200 pb-4 mb-4">
-                    <h1 className="text-4xl font-extrabold tracking-tight text-gray-900 mb-1">{activeProduct.name}</h1>
-                    <div className="flex items-center justify-between">
-                      <span className="text-3xl font-bold text-primary-accent">{formatCurrency(activeProduct.price)}</span>
-                      <div className="flex items-center gap-1 text-sm text-gray-500">
-                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-amber-400"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                         <span>{activeProduct.rating} ({activeProduct.reviews} reviews)</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="text-base text-gray-600 mb-8 leading-relaxed border-l-2 border-primary-accent pl-4 py-2 bg-teal-50/50">
-                    <p>{activeProduct.description}</p>
-                  </div>
-
-                  {/* Specs Grid */}
-                  <div className="bg-soft-gray rounded-lg border border-gray-200 p-6 mb-8 shadow-inner">
-                    <h3 className="text-sm font-bold uppercase tracking-wider text-gray-700 mb-4">Key Features</h3>
-                    <ul className="space-y-3">
-                      {activeProduct.features.map((feature, idx) => (
-                        <li key={idx} className="flex items-center text-base text-gray-700">
-                          <Check width={16} height={16} className="text-primary-accent mr-3 flex-shrink-0" />
-                          {feature}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                  
-                  <div className="mt-auto space-y-4">
-                    <div className="flex gap-4">
-                      <Button variant="primary" className="flex-1 py-4 text-lg font-bold" onClick={() => addToCart(activeProduct)}>
-                        Add to Cart
-                      </Button>
-                      <Button variant="secondary" className="px-4 text-primary-accent">
-                         <Heart width={24} height={24} fill="none" />
-                      </Button>
-                    </div>
-                    
-                    <p className="text-xs text-center text-gray-500 pt-2">
-                       Free shipping & easy 30-day returns.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
+            React.createElement('div', { className: "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 animate-fade-in" },
+                React.createElement('div', { className: "mb-6 text-sm text-gray-500" },
+                    React.createElement('span', { onClick: () => setView('home'), className: "cursor-pointer hover:text-primary-accent" }, "Home"),
+                    React.createElement('span', { className: "mx-2" }, "/"),
+                    React.createElement('span', { className: "uppercase" }, activeProduct.category.replace('_', ' ')),
+                    React.createElement('span', { className: "mx-2" }, "/"),
+                    React.createElement('span', { className: "text-gray-900 font-medium" }, activeProduct.name)
+                ),
+                React.createElement('div', { className: "lg:grid lg:grid-cols-12 lg:gap-16" },
+                    React.createElement('div', { className: "lg:col-span-7 flex flex-col gap-4" },
+                        React.createElement('div', { className: "relative aspect-square bg-soft-gray rounded-xl overflow-hidden shadow-lg-soft" },
+                            React.createElement('img', { src: activeProduct.image, alt: activeProduct.name, className: "w-full h-full object-cover object-center" })
+                        ),
+                        React.createElement('div', { className: "grid grid-cols-4 gap-4" },
+                            [1, 2, 3, 4].map(i =>
+                                React.createElement('div', { key: i, className: "aspect-square border-2 border-transparent hover:border-primary-accent transition-colors rounded-lg bg-soft-gray cursor-pointer p-1" },
+                                    React.createElement('img', { src: activeProduct.image, alt: "", className: "w-full h-full object-cover rounded" })
+                                )
+                            )
+                        )
+                    ),
+                    React.createElement('div', { className: "lg:col-span-5 mt-10 lg:mt-0 flex flex-col" },
+                        React.createElement('div', { className: "border-b border-gray-200 pb-4 mb-4" },
+                            React.createElement('h1', { className: "text-4xl font-extrabold tracking-tight text-gray-900 mb-1" }, activeProduct.name),
+                            React.createElement('div', { className: "flex items-center justify-between" },
+                                React.createElement('span', { className: "text-3xl font-bold text-primary-accent" }, formatCurrency(activeProduct.price)),
+                                React.createElement('div', { className: "flex items-center gap-1 text-sm text-gray-500" },
+                                    React.createElement('svg', { xmlns: "http://www.w3.org/2000/svg", width: "16", height: "16", viewBox: "0 0 24 24", fill: "currentColor", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", className: "text-amber-400" },
+                                        React.createElement('polygon', { points: "12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" })
+                                    ),
+                                    React.createElement('span', null, `${activeProduct.rating} (${activeProduct.reviews} reviews)`)
+                                )
+                            )
+                        ),
+                        React.createElement('div', { className: "text-base text-gray-600 mb-8 leading-relaxed border-l-2 border-primary-accent pl-4 py-2 bg-teal-50/50" },
+                            React.createElement('p', null, activeProduct.description)
+                        ),
+                        React.createElement('div', { className: "bg-soft-gray rounded-lg border border-gray-200 p-6 mb-8 shadow-inner" },
+                            React.createElement('h3', { className: "text-sm font-bold uppercase tracking-wider text-gray-700 mb-4" }, "Key Features"),
+                            React.createElement('ul', { className: "space-y-3" },
+                                activeProduct.features.map((feature, idx) =>
+                                    React.createElement('li', { key: idx, className: "flex items-center text-base text-gray-700" },
+                                        React.createElement(Check, { width: 16, height: 16, className: "text-primary-accent mr-3 flex-shrink-0" }),
+                                        feature
+                                    )
+                                )
+                            )
+                        ),
+                        React.createElement('div', { className: "mt-auto space-y-4" },
+                            React.createElement('div', { className: "flex gap-4" },
+                                React.createElement(Button, { variant: "primary", className: "flex-1 py-4 text-lg font-bold", onClick: () => addToCart(activeProduct) }, "Add to Cart"),
+                                React.createElement(Button, { variant: "secondary", className: "px-4 text-primary-accent" },
+                                    React.createElement(Heart, { width: 24, height: 24, fill: "none" })
+                                )
+                            ),
+                            React.createElement('p', { className: "text-xs text-center text-gray-500 pt-2" }, "Free shipping & easy 30-day returns.")
+                        )
+                    )
+                )
+            )
           );
 
           const CheckoutView = () => {
@@ -677,242 +641,220 @@
             };
 
             if (step === 3) {
-              return (
-                <div className="max-w-2xl mx-auto px-4 py-24 text-center animate-fade-in">
-                  <div className="inline-block p-4 border-2 border-primary-accent rounded-full mb-6 relative bg-teal-50">
-                    <Check className="text-primary-accent" />
-                  </div>
-                  <h2 className="text-3xl font-extrabold text-gray-900 mb-2">Order Confirmed!</h2>
-                  <p className="text-gray-600 text-lg mb-4">
-                    Thank you for your purchase. Your order has been placed successfully.
-                  </p>
-                  <p className="text-sm text-gray-500 mb-8">
-                    Confirmation ID: #AGT-{Math.floor(Math.random() * 1000000)}
-                  </p>
-                  <Button onClick={() => setView('home')}>Continue Shopping</Button>
-                </div>
+              return React.createElement('div', { className: "max-w-2xl mx-auto px-4 py-24 text-center animate-fade-in" },
+                React.createElement('div', { className: "inline-block p-4 border-2 border-primary-accent rounded-full mb-6 relative bg-teal-50" },
+                    React.createElement(Check, { className: "text-primary-accent" })
+                ),
+                React.createElement('h2', { className: "text-3xl font-extrabold text-gray-900 mb-2" }, "Order Confirmed!"),
+                React.createElement('p', { className: "text-gray-600 text-lg mb-4" }, "Thank you for your purchase. Your order has been placed successfully."),
+                React.createElement('p', { className: "text-sm text-gray-500 mb-8" }, `Confirmation ID: #AGT-${Math.floor(Math.random() * 1000000)}`),
+                React.createElement(Button, { onClick: () => setView('home') }, "Continue Shopping")
               );
             }
 
-            return (
-              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-                <h1 className="text-3xl font-extrabold border-b-2 border-primary-accent pb-3 mb-10 text-gray-900">
-                  Secure Checkout
-                </h1>
-                
-                <div className="lg:grid lg:grid-cols-12 lg:gap-x-12 lg:items-start">
-                  
-                  {/* Order Summary (Right Column on Desktop) */}
-                  <div className="lg:col-span-5 lg:col-start-8 mt-10 lg:mt-0 bg-soft-gray rounded-xl border border-gray-200 p-6 shadow-soft order-2 lg:order-1">
-                    <h2 className="text-lg font-bold tracking-tight text-gray-900 mb-6 border-b border-gray-200 pb-3">Order Summary</h2>
-                    <div className="flow-root">
-                      <ul className="-my-4 divide-y divide-gray-200">
-                        {cart.map((product) => (
-                          <li key={product.id} className="py-4 flex">
-                            <div className="flex-shrink-0 w-16 h-16 bg-gray-100 rounded-lg overflow-hidden border border-gray-200">
-                              <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
-                            </div>
-                            <div className="ml-4 flex-1 flex flex-col justify-center">
-                              <p className="text-sm font-medium text-gray-900">{product.name}</p>
-                              <p className="text-xs text-gray-500">Qty: {product.quantity}</p>
-                            </div>
-                            <p className="text-sm font-medium text-gray-900">{formatCurrency(product.price * product.quantity)}</p>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                    <div className="border-t border-gray-200 mt-6 pt-6 text-base">
-                      <div className="flex justify-between mb-2 text-gray-600">
-                        <p>Subtotal</p>
-                        <p>{formatCurrency(cartTotal)}</p>
-                      </div>
-                      <div className="flex justify-between mb-4 text-gray-500">
-                        <p>Shipping</p>
-                        <p>Free</p>
-                      </div>
-                      <div className="flex justify-between text-xl font-extrabold text-gray-900 border-t border-gray-300 pt-4">
-                        <p>Order Total</p>
-                        <p>{formatCurrency(cartTotal)}</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Form (Left Column on Desktop) */}
-                  <div className="lg:col-span-7 lg:col-start-1 order-1 lg:order-2">
-                     <form onSubmit={handlePlaceOrder} className="space-y-8">
-                        
-                        {/* Steps Indicator */}
-                        <div className="flex items-center space-x-6 text-sm font-semibold uppercase">
-                          <span className={`pb-2 border-b-2 ${step === 1 ? 'border-primary-accent text-primary-accent' : 'border-transparent text-gray-500'}`}>1. Shipping</span>
-                          <span className={`pb-2 border-b-2 ${step === 2 ? 'border-primary-accent text-primary-accent' : 'border-transparent text-gray-500'}`}>2. Payment</span>
-                        </div>
-
-                        {step === 1 && (
-                          <div className="space-y-6 animate-fade-in bg-white p-6 rounded-xl shadow-md border border-gray-100">
-                            <h3 className="text-lg font-semibold text-gray-900 border-b pb-2 mb-4">Shipping Information</h3>
-                            <div className="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2">
-                              <div className="sm:col-span-1">
-                                <label className="block text-xs font-medium text-gray-700 mb-1">First Name</label>
-                                <input type="text" required className="block w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:border-primary-accent focus:ring-primary-accent/50 transition-colors" />
-                              </div>
-                              <div className="sm:col-span-1">
-                                <label className="block text-xs font-medium text-gray-700 mb-1">Last Name</label>
-                                <input type="text" required className="block w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:border-primary-accent focus:ring-primary-accent/50 transition-colors" />
-                              </div>
-                              <div className="sm:col-span-2">
-                                <label className="block text-xs font-medium text-gray-700 mb-1">Address Line 1</label>
-                                <input type="text" required className="block w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:border-primary-accent focus:ring-primary-accent/50 transition-colors" />
-                              </div>
-                              <div className="sm:col-span-1">
-                                <label className="block text-xs font-medium text-gray-700 mb-1">City</label>
-                                <input type="text" required className="block w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:border-primary-accent focus:ring-primary-accent/50 transition-colors" />
-                              </div>
-                              <div className="sm:col-span-1">
-                                <label className="block text-xs font-medium text-gray-700 mb-1">Postal Code</label>
-                                <input type="text" required className="block w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:border-primary-accent focus:ring-primary-accent/50 transition-colors" />
-                              </div>
-                            </div>
-                            <Button type="button" onClick={() => setStep(2)} className="w-full mt-6 py-3">
-                              Continue to Payment
-                            </Button>
-                          </div>
-                        )}
-
-                        {step === 2 && (
-                           <div className="space-y-6 animate-fade-in bg-white p-6 rounded-xl shadow-md border border-gray-100">
-                              <h3 className="text-lg font-semibold text-gray-900 border-b pb-2 mb-4">Payment Method</h3>
-                              <div className="bg-teal-50 border border-primary-accent/50 rounded-lg p-4 flex items-center justify-between">
-                                <div className="flex items-center gap-3">
-                                   <CreditCard className="text-primary-accent" />
-                                   <span className="text-sm font-semibold text-gray-800">Credit Card</span>
-                                </div>
-                              </div>
-                              
-                              <div className="space-y-4">
-                                <div>
-                                  <label className="block text-xs font-medium text-gray-700 mb-1">Card Number</label>
-                                  <input type="text" placeholder="XXXX XXXX XXXX XXXX" required className="block w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:border-primary-accent focus:ring-primary-accent/50 transition-colors" />
-                                </div>
-                                <div className="grid grid-cols-2 gap-4">
-                                  <div>
-                                    <label className="block text-xs font-medium text-gray-700 mb-1">Expiration Date</label>
-                                    <input type="text" placeholder="MM/YY" required className="block w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:border-primary-accent focus:ring-primary-accent/50 transition-colors" />
-                                  </div>
-                                  <div>
-                                    <label className="block text-xs font-medium text-gray-700 mb-1">CVC</label>
-                                    <input type="text" placeholder="CVC" required className="block w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:border-primary-accent focus:ring-primary-accent/50 transition-colors" />
-                                  </div>
-                                </div>
-                              </div>
-
-                              <div className="flex gap-4 pt-4">
-                                <Button variant="secondary" type="button" onClick={() => setStep(1)} className="flex-1 py-3">Back to Shipping</Button>
-                                <Button variant="primary" type="submit" disabled={loading} className="flex-1 py-3">
-                                  {loading ? 'Processing...' : `Place Order (${formatCurrency(cartTotal)})`}
-                                </Button>
-                              </div>
-                           </div>
-                        )}
-                     </form>
-                  </div>
-                </div>
-              </div>
+            return React.createElement('div', { className: "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12" },
+                React.createElement('h1', { className: "text-3xl font-extrabold border-b-2 border-primary-accent pb-3 mb-10 text-gray-900" }, "Secure Checkout"),
+                React.createElement('div', { className: "lg:grid lg:grid-cols-12 lg:gap-x-12 lg:items-start" },
+                    React.createElement('div', { className: "lg:col-span-5 lg:col-start-8 mt-10 lg:mt-0 bg-soft-gray rounded-xl border border-gray-200 p-6 shadow-soft order-2 lg:order-1" },
+                        React.createElement('h2', { className: "text-lg font-bold tracking-tight text-gray-900 mb-6 border-b border-gray-200 pb-3" }, "Order Summary"),
+                        React.createElement('div', { className: "flow-root" },
+                            React.createElement('ul', { className: "-my-4 divide-y divide-gray-200" },
+                                cart.map((product) =>
+                                    React.createElement('li', { key: product.id, className: "py-4 flex" },
+                                        React.createElement('div', { className: "flex-shrink-0 w-16 h-16 bg-gray-100 rounded-lg overflow-hidden border border-gray-200" },
+                                            React.createElement('img', { src: product.image, alt: product.name, className: "w-full h-full object-cover" })
+                                        ),
+                                        React.createElement('div', { className: "ml-4 flex-1 flex flex-col justify-center" },
+                                            React.createElement('p', { className: "text-sm font-medium text-gray-900" }, product.name),
+                                            React.createElement('p', { className: "text-xs text-gray-500" }, `Qty: ${product.quantity}`)
+                                        ),
+                                        React.createElement('p', { className: "text-sm font-medium text-gray-900" }, formatCurrency(product.price * product.quantity))
+                                    )
+                                )
+                            )
+                        ),
+                        React.createElement('div', { className: "border-t border-gray-200 mt-6 pt-6 text-base" },
+                            React.createElement('div', { className: "flex justify-between mb-2 text-gray-600" },
+                                React.createElement('p', null, "Subtotal"),
+                                React.createElement('p', null, formatCurrency(cartTotal))
+                            ),
+                            React.createElement('div', { className: "flex justify-between mb-4 text-gray-500" },
+                                React.createElement('p', null, "Shipping"),
+                                React.createElement('p', null, "Free")
+                            ),
+                            React.createElement('div', { className: "flex justify-between text-xl font-extrabold text-gray-900 border-t border-gray-300 pt-4" },
+                                React.createElement('p', null, "Order Total"),
+                                React.createElement('p', null, formatCurrency(cartTotal))
+                            )
+                        )
+                    ),
+                    React.createElement('div', { className: "lg:col-span-7 lg:col-start-1 order-1 lg:order-2" },
+                        React.createElement('form', { onSubmit: handlePlaceOrder, className: "space-y-8" },
+                            React.createElement('div', { className: "flex items-center space-x-6 text-sm font-semibold uppercase" },
+                                React.createElement('span', { className: `pb-2 border-b-2 ${step === 1 ? 'border-primary-accent text-primary-accent' : 'border-transparent text-gray-500'}` }, "1. Shipping"),
+                                React.createElement('span', { className: `pb-2 border-b-2 ${step === 2 ? 'border-primary-accent text-primary-accent' : 'border-transparent text-gray-500'}` }, "2. Payment")
+                            ),
+                            step === 1 &&
+                            React.createElement('div', { className: "space-y-6 animate-fade-in bg-white p-6 rounded-xl shadow-md border border-gray-100" },
+                                React.createElement('h3', { className: "text-lg font-semibold text-gray-900 border-b pb-2 mb-4" }, "Shipping Information"),
+                                React.createElement('div', { className: "grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2" },
+                                    React.createElement('div', { className: "sm:col-span-1" },
+                                        React.createElement('label', { className: "block text-xs font-medium text-gray-700 mb-1" }, "First Name"),
+                                        React.createElement('input', { type: "text", required: true, className: "block w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:border-primary-accent focus:ring-primary-accent/50 transition-colors" })
+                                    ),
+                                    React.createElement('div', { className: "sm:col-span-1" },
+                                        React.createElement('label', { className: "block text-xs font-medium text-gray-700 mb-1" }, "Last Name"),
+                                        React.createElement('input', { type: "text", required: true, className: "block w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:border-primary-accent focus:ring-primary-accent/50 transition-colors" })
+                                    ),
+                                    React.createElement('div', { className: "sm:col-span-2" },
+                                        React.createElement('label', { className: "block text-xs font-medium text-gray-700 mb-1" }, "Address Line 1"),
+                                        React.createElement('input', { type: "text", required: true, className: "block w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:border-primary-accent focus:ring-primary-accent/50 transition-colors" })
+                                    ),
+                                    React.createElement('div', { className: "sm:col-span-1" },
+                                        React.createElement('label', { className: "block text-xs font-medium text-gray-700 mb-1" }, "City"),
+                                        React.createElement('input', { type: "text", required: true, className: "block w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:border-primary-accent focus:ring-primary-accent/50 transition-colors" })
+                                    ),
+                                    React.createElement('div', { className: "sm:col-span-1" },
+                                        React.createElement('label', { className: "block text-xs font-medium text-gray-700 mb-1" }, "Postal Code"),
+                                        React.createElement('input', { type: "text", required: true, className: "block w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:border-primary-accent focus:ring-primary-accent/50 transition-colors" })
+                                    )
+                                ),
+                                React.createElement(Button, { type: "button", onClick: () => setStep(2), className: "w-full mt-6 py-3" }, "Continue to Payment")
+                            ),
+                            step === 2 &&
+                            React.createElement('div', { className: "space-y-6 animate-fade-in bg-white p-6 rounded-xl shadow-md border border-gray-100" },
+                                React.createElement('h3', { className: "text-lg font-semibold text-gray-900 border-b pb-2 mb-4" }, "Payment Method"),
+                                React.createElement('div', { className: "bg-teal-50 border border-primary-accent/50 rounded-lg p-4 flex items-center justify-between" },
+                                    React.createElement('div', { className: "flex items-center gap-3" },
+                                        React.createElement(CreditCard, { className: "text-primary-accent" }),
+                                        React.createElement('span', { className: "text-sm font-semibold text-gray-800" }, "Credit Card")
+                                    )
+                                ),
+                                React.createElement('div', { className: "space-y-4" },
+                                    React.createElement('div', null,
+                                        React.createElement('label', { className: "block text-xs font-medium text-gray-700 mb-1" }, "Card Number"),
+                                        React.createElement('input', { type: "text", placeholder: "XXXX XXXX XXXX XXXX", required: true, className: "block w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:border-primary-accent focus:ring-primary-accent/50 transition-colors" })
+                                    ),
+                                    React.createElement('div', { className: "grid grid-cols-2 gap-4" },
+                                        React.createElement('div', null,
+                                            React.createElement('label', { className: "block text-xs font-medium text-gray-700 mb-1" }, "Expiration Date"),
+                                            React.createElement('input', { type: "text", placeholder: "MM/YY", required: true, className: "block w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:border-primary-accent focus:ring-primary-accent/50 transition-colors" })
+                                        ),
+                                        React.createElement('div', null,
+                                            React.createElement('label', { className: "block text-xs font-medium text-gray-700 mb-1" }, "CVC"),
+                                            React.createElement('input', { type: "text", placeholder: "CVC", required: true, className: "block w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:border-primary-accent focus:ring-primary-accent/50 transition-colors" })
+                                        )
+                                    )
+                                ),
+                                React.createElement('div', { className: "flex gap-4 pt-4" },
+                                    React.createElement(Button, { variant: "secondary", type: "button", onClick: () => setStep(1), className: "flex-1 py-3" }, "Back to Shipping"),
+                                    React.createElement(Button, { variant: "primary", type: "submit", disabled: loading, className: "flex-1 py-3" }, loading ? 'Processing...' : `Place Order (${formatCurrency(cartTotal)})`)
+                                )
+                            )
+                        )
+                    )
+                )
             );
           };
 
           const Footer = () => (
-            <footer className="bg-gray-900 text-white pt-16 pb-8 font-sans">
-              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-12 mb-12 border-b border-gray-800 pb-10">
-                   <div className="col-span-2 md:col-span-1">
-                     <div className="flex items-center gap-2 mb-4 text-primary-accent">
-                        <ShoppingBag className="w-6 h-6" />
-                        <span className="font-bold text-2xl tracking-tight text-white">AGATE</span>
-                     </div>
-                     <p className="text-gray-400 text-sm leading-relaxed">
-                       Curated gear for a curated life. Quality and performance guaranteed.
-                     </p>
-                   </div>
-                   <div>
-                     <h3 className="font-semibold text-white mb-4 uppercase tracking-wider text-sm">Shop</h3>
-                     <ul className="space-y-2 text-gray-400 text-sm">
-                       <li className="hover:text-primary-accent cursor-pointer">New Arrivals</li>
-                       <li className="hover:text-primary-accent cursor-pointer">Top Sellers</li>
-                       <li className="hover:text-primary-accent cursor-pointer">All Categories</li>
-                     </ul>
-                   </div>
-                   <div>
-                     <h3 className="font-semibold text-white mb-4 uppercase tracking-wider text-sm">Support</h3>
-                     <ul className="space-y-2 text-gray-400 text-sm">
-                       <li className="hover:text-primary-accent cursor-pointer">Help Center</li>
-                       <li className="hover:text-primary-accent cursor-pointer">Returns & Exchanges</li>
-                       <li className="hover:text-primary-accent cursor-pointer">Warranty</li>
-                     </ul>
-                   </div>
-                   <div>
-                     <h3 className="font-semibold text-white mb-4 uppercase tracking-wider text-sm">Stay Updated</h3>
-                     <div className="flex gap-2">
-                       <input type="email" placeholder="Your email address" className="bg-gray-800 border border-gray-700 px-3 py-2 w-full text-sm rounded-lg focus:border-primary-accent focus:outline-none" />
-                       <button className="bg-primary-accent text-white px-4 rounded-lg font-semibold hover:bg-teal-600">→</button>
-                     </div>
-                   </div>
-                </div>
-                <div className="pt-4 flex flex-col md:flex-row justify-between items-center text-gray-500 text-xs">
-                  <p>© 2024 Agate Industries. All rights reserved.</p>
-                  <div className="flex gap-4 mt-3 md:mt-0">
-                     <span className="hover:text-white cursor-pointer">Privacy</span>
-                     <span className="hover:text-white cursor-pointer">Terms</span>
-                  </div>
-                </div>
-              </div>
-            </footer>
+            React.createElement('footer', { className: "bg-gray-900 text-white pt-16 pb-8 font-sans" },
+                React.createElement('div', { className: "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" },
+                    React.createElement('div', { className: "grid grid-cols-2 md:grid-cols-4 gap-12 mb-12 border-b border-gray-800 pb-10" },
+                        React.createElement('div', { className: "col-span-2 md:col-span-1" },
+                            React.createElement('div', { className: "flex items-center gap-2 mb-4 text-primary-accent" },
+                                React.createElement(ShoppingBag, { className: "w-6 h-6" }),
+                                React.createElement('span', { className: "font-bold text-2xl tracking-tight text-white" }, "AGATE")
+                            ),
+                            React.createElement('p', { className: "text-gray-400 text-sm leading-relaxed" }, "Curated gear for a curated life. Quality and performance guaranteed.")
+                        ),
+                        React.createElement('div', null,
+                            React.createElement('h3', { className: "font-semibold text-white mb-4 uppercase tracking-wider text-sm" }, "Shop"),
+                            React.createElement('ul', { className: "space-y-2 text-gray-400 text-sm" },
+                                React.createElement('li', { className: "hover:text-primary-accent cursor-pointer" }, "New Arrivals"),
+                                React.createElement('li', { className: "hover:text-primary-accent cursor-pointer" }, "Top Sellers"),
+                                React.createElement('li', { className: "hover:text-primary-accent cursor-pointer" }, "All Categories")
+                            )
+                        ),
+                        React.createElement('div', null,
+                            React.createElement('h3', { className: "font-semibold text-white mb-4 uppercase tracking-wider text-sm" }, "Support"),
+                            React.createElement('ul', { className: "space-y-2 text-gray-400 text-sm" },
+                                React.createElement('li', { className: "hover:text-primary-accent cursor-pointer" }, "Help Center"),
+                                React.createElement('li', { className: "hover:text-primary-accent cursor-pointer" }, "Returns & Exchanges"),
+                                React.createElement('li', { className: "hover:text-primary-accent cursor-pointer" }, "Warranty")
+                            )
+                        ),
+                        React.createElement('div', null,
+                            React.createElement('h3', { className: "font-semibold text-white mb-4 uppercase tracking-wider text-sm" }, "Stay Updated"),
+                            React.createElement('div', { className: "flex gap-2" },
+                                React.createElement('input', { type: "email", placeholder: "Your email address", className: "bg-gray-800 border border-gray-700 px-3 py-2 w-full text-sm rounded-lg focus:border-primary-accent focus:outline-none" }),
+                                React.createElement('button', { className: "bg-primary-accent text-white px-4 rounded-lg font-semibold hover:bg-teal-600" }, "→")
+                            )
+                        )
+                    ),
+                    React.createElement('div', { className: "pt-4 flex flex-col md:flex-row justify-between items-center text-gray-500 text-xs" },
+                        React.createElement('p', null, "© 2024 Agate Industries. All rights reserved."),
+                        React.createElement('div', { className: "flex gap-4 mt-3 md:mt-0" },
+                            React.createElement('span', { className: "hover:text-white cursor-pointer" }, "Privacy"),
+                            React.createElement('span', { className: "hover:text-white cursor-pointer" }, "Terms")
+                        )
+                    )
+                )
+            )
           );
 
-          return (
-            // Removed dark mode classes from root div, ensuring light mode by default
-            <div className={`min-h-screen flex flex-col transition-colors duration-300 font-sans selection:bg-primary-accent selection:text-white ${darkMode ? 'dark bg-gray-900 text-white' : 'bg-white text-gray-900'}`}>
-              <Navbar />
-              
-              <main className="flex-grow">
-                {view === 'home' && (
-                  <>
-                    {!searchQuery && <Hero />}
-                    <ProductList />
-                  </>
-                )}
-                {view === 'product' && activeProduct && <ProductDetailView />}
-                {view === 'checkout' && cart.length > 0 && <CheckoutView />}
-              </main>
+          const AboutView = () => (
+            React.createElement('div', { className: "max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 animate-fade-in text-gray-800" },
+                React.createElement('h1', { className: "text-4xl font-extrabold text-primary-accent mb-6" }, "About Agate Industries"),
+                React.createElement('p', { className: "text-xl mb-8" }, "We engineer the future, one elegant product at a time. Agate Industries is dedicated to fusing minimalist design with maximum performance."),
+                React.createElement('div', { className: "space-y-10" },
+                    React.createElement('div', null,
+                        React.createElement('h2', { className: "text-2xl font-bold mb-3" }, "Our Philosophy: Durability & Design"),
+                        React.createElement('p', { className: "text-lg leading-relaxed" }, "Every item in our collection is subjected to rigorous testing to ensure it withstands the demands of modern life. We believe technology should integrate seamlessly, disappearing into the background until its performance is called upon. From the Quantum X headphones to the Velocity Shell apparel, our focus is on materials science, intuitive ergonomics, and longevity.")
+                    ),
+                    React.createElement('div', { className: "grid grid-cols-1 md:grid-cols-3 gap-8 text-center pt-4 border-t border-gray-100" },
+                        React.createElement('div', { className: "p-4 bg-soft-gray rounded-xl shadow-soft" },
+                            React.createElement(ShoppingBag, { className: "w-8 h-8 mx-auto text-primary-accent mb-2" }),
+                            React.createElement('p', { className: "font-semibold" }, "Sustainable Sourcing"),
+                            React.createElement('p', { className: "text-sm text-gray-600" }, "Committed to ethical material chains.")
+                        ),
+                        React.createElement('div', { className: "p-4 bg-soft-gray rounded-xl shadow-soft" },
+                            React.createElement(Check, { className: "w-8 h-8 mx-auto text-primary-accent mb-2" }),
+                            React.createElement('p', { className: "font-semibold" }, "Lifetime Guarantee"),
+                            React.createElement('p', { className: "text-sm text-gray-600" }, "Confidence in every product we ship.")
+                        ),
+                        React.createElement('div', { className: "p-4 bg-soft-gray rounded-xl shadow-soft" },
+                            React.createElement(Heart, { className: "w-8 h-8 mx-auto text-primary-accent mb-2" }),
+                            React.createElement('p', { className: "font-semibold" }, "Community Focused"),
+                            React.createElement('p', { className: "text-sm text-gray-600" }, "Supporting creators and innovators globally.")
+                        )
+                    )
+                ),
+                React.createElement(Button, { onClick: () => setView('home'), className: "mt-12 py-3" }, "Back to Shopping")
+            )
+          );
 
-              <Footer />
-              <CartDrawer />
-              <Notification show={toast.show} message={toast.message} onClose={() => setToast({...toast, show: false})} />
-              
-              {/* Animation Styles */}
-              <style>{`
-                @keyframes slide-up {
-                  from { transform: translateY(100%); opacity: 0; }
-                  to { transform: translateY(0); opacity: 1; }
-                }
-                .animate-slide-up {
-                  animation: slide-up 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-                }
-                .animate-fade-in {
-                  animation: fade-in 0.6s ease-out forwards;
-                }
-                @keyframes fade-in {
-                  from { opacity: 0; }
-                  to { opacity: 1; }
-                }
-              `}</style>
-            </div>
+          return React.createElement('div', { className: `min-h-screen flex flex-col transition-colors duration-300 font-sans selection:bg-primary-accent selection:text-white ${darkMode ? 'dark bg-gray-900 text-white' : 'bg-white text-gray-900'}` },
+              React.createElement(Navbar, null),
+              React.createElement('main', { className: "flex-grow" },
+                  view === 'home' &&
+                  React.createElement(React.Fragment, null,
+                      !searchQuery && React.createElement(Hero, null),
+                      React.createElement(ProductList, null)
+                  ),
+                  view === 'product' && activeProduct && React.createElement(ProductDetailView, null),
+                  view === 'checkout' && cart.length > 0 && React.createElement(CheckoutView, null),
+                  view === 'about' && React.createElement(AboutView, null)
+              ),
+              React.createElement(Footer, null),
+              React.createElement(CartDrawer, null),
+              React.createElement(Notification, { show: toast.show, message: toast.message, onClose: () => setToast({...toast, show: false}) })
           );
         }
 
-        // Mount the application to the DOM
-        ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+        // Use ReactDOM.createRoot for production-ready React 18 rendering
+        ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(App));
 
     </script>
 </body>
-
 </html>
