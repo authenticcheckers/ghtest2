@@ -101,6 +101,9 @@
         );
 
         // --- Mock Data (Retained) ---
+        // Placeholder URL for failed images
+        const PLACEHOLDER_URL = "https://placehold.co/800x1000/F4F4F5/A1A1AA?text=AGATE+NOT+FOUND";
+
         const PRODUCTS = [
           {
             id: "AGT-001",
@@ -142,7 +145,8 @@
             category: "OPTICS",
             rating: 4.7,
             reviews: 67,
-            image: "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=800&q=80",
+            // Example of a potentially broken link to test the fallback:
+            image: "https://images.unsplash.com/photo-1516035069371-29a1b244cc32-BROKEN-LINK?w=800&q=80", 
             description: "Professional imaging in a dense alloy body. AI-driven autofocus locks onto targets in 0.02s.",
             features: ["45MP Sensor", "8K Stream", "Neural Autofocus"]
           },
@@ -228,11 +232,18 @@
         const ProductCard = ({ product, onClick, onAddToCart }) => (
             React.createElement('div', { className: "group relative bg-white border border-gray-100 rounded-xl shadow-lg-soft overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 flex flex-col h-full" },
                 React.createElement('div', { className: "relative aspect-[4/5] bg-soft-gray overflow-hidden" },
+                    // Image element with enhanced error handling
                     React.createElement('img', {
                         src: product.image,
                         alt: product.name,
                         className: "w-full h-full object-cover transition-transform duration-500 scale-100 group-hover:scale-105",
-                        onError: (e) => { e.target.onerror = null; e.target.src = "https://placehold.co/800x1000/F4F4F5/A1A1AA?text=AGATE"; }
+                        // CRITICAL FIX: Use onError to fallback to the placeholder image
+                        onError: (e) => { 
+                            e.target.onerror = null; // Prevent infinite loop if placeholder fails
+                            e.target.src = PLACEHOLDER_URL; 
+                            e.target.classList.remove('group-hover:scale-105'); // Remove hover effect on placeholder
+                            e.target.style.filter = "grayscale(100%)"; // Style the fallback image
+                        }
                     }),
                     React.createElement('div', { className: "absolute inset-0 flex items-end justify-center bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" },
                         React.createElement(Button, {
@@ -363,7 +374,7 @@
           // --- Layout Components (Converted) ---
 
           const Navbar = () => (
-            React.createElement('nav', { className: "sticky top-0 z-40 bg-white shadow-lg-soft" },
+            React.createElement('nav', { className: "sticky top-0 z-40 bg-white shadow-lg-soft dark:bg-gray-800 dark:shadow-none dark:border-b dark:border-gray-700" },
                 React.createElement('div', { className: "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" },
                     React.createElement('div', { className: "flex items-center justify-between h-20" },
                         React.createElement('div', { 
@@ -371,7 +382,7 @@
                             onClick: () => { setView('home'); setSearchQuery(''); } 
                         },
                             React.createElement(ShoppingBag, { className: "text-primary-accent w-6 h-6" }),
-                            React.createElement('span', { className: "font-bold text-2xl tracking-tight text-gray-900" }, "AGATE"),
+                            React.createElement('span', { className: "font-bold text-2xl tracking-tight text-gray-900 dark:text-white" }, "AGATE"),
                             React.createElement('span', { className: "text-xs text-gray-500 uppercase" }, "Retail")
                         ),
                         React.createElement('div', { className: "flex-1 flex justify-center mx-4 md:mx-12" },
@@ -382,7 +393,7 @@
                                 React.createElement('input', {
                                     type: "text",
                                     placeholder: "Search products...",
-                                    className: "block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-full bg-soft-gray text-gray-900 text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-accent focus:border-primary-accent transition-all",
+                                    className: "block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-full bg-soft-gray text-gray-900 text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-accent focus:border-primary-accent transition-all dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400",
                                     value: searchQuery,
                                     onChange: (e) => {
                                         setSearchQuery(e.target.value);
@@ -394,7 +405,7 @@
                         React.createElement('div', { className: "flex items-center gap-2 sm:gap-4" },
                             React.createElement('button', {
                                 onClick: () => setDarkMode(!darkMode),
-                                className: "p-2 text-gray-500 hover:text-primary-accent transition-colors rounded-full hover:bg-gray-100",
+                                className: "p-2 text-gray-500 hover:text-primary-accent transition-colors rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-gray-300",
                                 title: "Toggle Theme"
                             }, 
                                 darkMode 
@@ -402,7 +413,7 @@
                                     : React.createElement(Moon, { width: 20, height: 20 })
                             ),
                             React.createElement('button', {
-                                className: "relative p-2 text-gray-500 hover:text-primary-accent transition-colors rounded-full hover:bg-gray-100",
+                                className: "relative p-2 text-gray-500 hover:text-primary-accent transition-colors rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-gray-300",
                                 onClick: () => setIsCartOpen(true),
                                 title: "View Cart"
                             },
@@ -423,10 +434,10 @@
                     onClick: () => setIsCartOpen(false)
                 }),
                 React.createElement('div', { className: `absolute inset-y-0 right-0 max-w-sm w-full flex pl-10 transform transition-transform duration-300 ${isCartOpen ? 'translate-x-0' : 'translate-x-full'}` },
-                    React.createElement('div', { className: "w-full flex flex-col h-full bg-white shadow-xl" },
-                        React.createElement('div', { className: "flex items-center justify-between px-6 py-5 border-b border-gray-200 bg-soft-gray" },
-                            React.createElement('h2', { className: "text-xl font-bold tracking-tight text-gray-900" }, `Your Shopping Cart (${cartCount})`),
-                            React.createElement('button', { onClick: () => setIsCartOpen(false), className: "text-gray-400 hover:text-gray-900 p-2" },
+                    React.createElement('div', { className: "w-full flex flex-col h-full bg-white shadow-xl dark:bg-gray-800 dark:text-white" },
+                        React.createElement('div', { className: "flex items-center justify-between px-6 py-5 border-b border-gray-200 bg-soft-gray dark:bg-gray-700 dark:border-gray-700" },
+                            React.createElement('h2', { className: "text-xl font-bold tracking-tight text-gray-900 dark:text-white" }, `Your Shopping Cart (${cartCount})`),
+                            React.createElement('button', { onClick: () => setIsCartOpen(false), className: "text-gray-400 hover:text-gray-900 p-2 dark:hover:text-white" },
                                 React.createElement(X, { width: 24, height: 24 })
                             )
                         ),
@@ -440,20 +451,30 @@
                             ) : (
                                 React.createElement('div', { className: "space-y-4" },
                                     cart.map(item => (
-                                        React.createElement('div', { key: item.id, className: "py-2 flex border-b border-dashed border-gray-100 last:border-b-0" },
-                                            React.createElement('div', { className: "flex-shrink-0 w-20 h-20 bg-gray-100 rounded-lg overflow-hidden border border-gray-200" },
-                                                React.createElement('img', { src: item.image, alt: item.name, className: "w-full h-full object-cover" })
+                                        React.createElement('div', { key: item.id, className: "py-2 flex border-b border-dashed border-gray-100 last:border-b-0 dark:border-gray-700" },
+                                            React.createElement('div', { className: "flex-shrink-0 w-20 h-20 bg-gray-100 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-600" },
+                                                React.createElement('img', { 
+                                                    src: item.image, 
+                                                    alt: item.name, 
+                                                    className: "w-full h-full object-cover",
+                                                    // Ensure cart images also use the fallback
+                                                    onError: (e) => { 
+                                                        e.target.onerror = null; 
+                                                        e.target.src = PLACEHOLDER_URL; 
+                                                        e.target.style.filter = "grayscale(100%)";
+                                                    }
+                                                })
                                             ),
                                             React.createElement('div', { className: "ml-4 flex-1 flex flex-col justify-between" },
                                                 React.createElement('div', { className: "flex justify-between items-start" },
-                                                    React.createElement('h3', { className: "text-sm font-semibold text-gray-900 hover:text-primary-accent" }, item.name),
-                                                    React.createElement('p', { className: "text-sm font-medium text-gray-900" }, formatCurrency(item.price * item.quantity))
+                                                    React.createElement('h3', { className: "text-sm font-semibold text-gray-900 hover:text-primary-accent dark:text-white" }, item.name),
+                                                    React.createElement('p', { className: "text-sm font-medium text-gray-900 dark:text-white" }, formatCurrency(item.price * item.quantity))
                                                 ),
                                                 React.createElement('div', { className: "flex items-center justify-between mt-2" },
-                                                    React.createElement('div', { className: "flex items-center space-x-2 border border-gray-200 rounded-lg" },
-                                                        React.createElement('button', { onClick: () => updateQuantity(item.id, -1), className: "p-1.5 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-l-lg text-sm transition-colors" }, "–"),
-                                                        React.createElement('span', { className: "text-sm font-medium w-4 text-center" }, item.quantity),
-                                                        React.createElement('button', { onClick: () => updateQuantity(item.id, 1), className: "p-1.5 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-r-lg text-sm transition-colors" }, "+")
+                                                    React.createElement('div', { className: "flex items-center space-x-2 border border-gray-200 rounded-lg dark:border-gray-600" },
+                                                        React.createElement('button', { onClick: () => updateQuantity(item.id, -1), className: "p-1.5 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-l-lg text-sm transition-colors dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-700" }, "–"),
+                                                        React.createElement('span', { className: "text-sm font-medium w-4 text-center dark:text-white" }, item.quantity),
+                                                        React.createElement('button', { onClick: () => updateQuantity(item.id, 1), className: "p-1.5 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-r-lg text-sm transition-colors dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-700" }, "+")
                                                     ),
                                                     React.createElement('button', { type: "button", onClick: () => removeFromCart(item.id), className: "text-xs font-medium text-red-500 hover:text-red-700" }, "Remove")
                                                 )
@@ -464,8 +485,8 @@
                             )
                         ),
                         cart.length > 0 &&
-                        React.createElement('div', { className: "border-t border-gray-200 px-6 py-6 bg-soft-gray" },
-                            React.createElement('div', { className: "flex justify-between text-base font-medium text-gray-900 mb-4" },
+                        React.createElement('div', { className: "border-t border-gray-200 px-6 py-6 bg-soft-gray dark:bg-gray-700 dark:border-gray-700" },
+                            React.createElement('div', { className: "flex justify-between text-base font-medium text-gray-900 mb-4 dark:text-white" },
                                 React.createElement('p', null, "Subtotal"),
                                 React.createElement('p', null, formatCurrency(cartTotal))
                             ),
@@ -483,35 +504,40 @@
           );
 
           const Hero = () => (
-            React.createElement('div', { className: "relative overflow-hidden bg-soft-gray border-b border-gray-200" },
+            React.createElement('div', { className: "relative overflow-hidden bg-soft-gray border-b border-gray-200 dark:bg-gray-900 dark:border-gray-700" },
                 React.createElement('div', { className: "relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-28" },
                     React.createElement('div', { className: "lg:grid lg:grid-cols-12 lg:gap-16 items-center" },
                         React.createElement('div', { className: "sm:text-center md:max-w-2xl md:mx-auto lg:col-span-6 lg:text-left relative z-10" },
-                            React.createElement('div', { className: "inline-flex items-center gap-2 px-3 py-1 bg-teal-100 text-teal-600 text-xs font-medium rounded-full mb-6" },
+                            React.createElement('div', { className: "inline-flex items-center gap-2 px-3 py-1 bg-teal-100 text-teal-600 text-xs font-medium rounded-full mb-6 dark:bg-teal-900/50 dark:text-teal-300" },
                                 React.createElement('span', { className: "w-1.5 h-1.5 bg-teal-500 rounded-full animate-pulse" }),
                                 "Spring/Summer Collection"
                             ),
-                            React.createElement('h1', { className: "text-5xl sm:text-6xl font-extrabold tracking-tight text-gray-900 mb-6" },
+                            React.createElement('h1', { className: "text-5xl sm:text-6xl font-extrabold tracking-tight text-gray-900 mb-6 dark:text-white" },
                                 "Engineered for ",
                                 React.createElement('span', { className: "text-primary-accent" }, "Modern Life"),
                                 "."
                             ),
-                            React.createElement('p', { className: "mt-4 text-lg text-gray-600 max-w-lg" }, "Discover Agate Industries' curated collection of high-performance electronics, apparel, and lifestyle tools designed for durability and seamless integration."),
+                            React.createElement('p', { className: "mt-4 text-lg text-gray-600 max-w-lg dark:text-gray-400" }, "Discover Agate Industries' curated collection of high-performance electronics, apparel, and lifestyle tools designed for durability and seamless integration."),
                             React.createElement('div', { className: "mt-10 flex flex-col sm:flex-row gap-4" },
                                 React.createElement(Button, { onClick: () => document.getElementById('products').scrollIntoView({ behavior: 'smooth' }), className: "py-3" }, "Shop Now"),
                                 React.createElement(Button, { variant: "secondary", onClick: () => setView('about'), className: "py-3" }, "Learn More")
                             )
                         ),
                         React.createElement('div', { className: "mt-12 lg:mt-0 lg:col-span-6 relative" },
-                            React.createElement('div', { className: "relative mx-auto w-full max-w-md p-4 bg-white rounded-2xl shadow-xl" },
+                            React.createElement('div', { className: "relative mx-auto w-full max-w-md p-4 bg-white rounded-2xl shadow-xl dark:bg-gray-800" },
                                 React.createElement('img', {
                                     className: "w-full aspect-square object-cover rounded-xl",
                                     src: "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=800&q=80",
-                                    alt: "Hero product showcase"
+                                    alt: "Hero product showcase",
+                                    onError: (e) => { 
+                                        e.target.onerror = null; 
+                                        e.target.src = PLACEHOLDER_URL; 
+                                        e.target.style.filter = "grayscale(100%)";
+                                    }
                                 }),
-                                React.createElement('div', { className: "absolute bottom-10 left-10 p-3 bg-white/80 backdrop-blur-sm rounded-lg shadow-md" },
-                                    React.createElement('p', { className: "text-xs text-gray-500 font-medium" }, "Starting at"),
-                                    React.createElement('p', { className: "text-2xl font-bold text-gray-900" }, formatCurrency(1350.00))
+                                React.createElement('div', { className: "absolute bottom-10 left-10 p-3 bg-white/80 backdrop-blur-sm rounded-lg shadow-md dark:bg-gray-900/80" },
+                                    React.createElement('p', { className: "text-xs text-gray-500 font-medium dark:text-gray-400" }, "Starting at"),
+                                    React.createElement('p', { className: "text-2xl font-bold text-gray-900 dark:text-white" }, formatCurrency(1350.00))
                                 )
                             )
                         )
@@ -521,11 +547,11 @@
           );
 
           const ProductList = () => (
-            React.createElement('div', { id: "products", className: "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 bg-white min-h-screen" },
-                React.createElement('div', { className: "flex flex-col md:flex-row md:items-end md:justify-between mb-12 gap-6 border-b border-gray-100 pb-6" },
+            React.createElement('div', { id: "products", className: "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 bg-white dark:bg-gray-900 min-h-screen" },
+                React.createElement('div', { className: "flex flex-col md:flex-row md:items-end md:justify-between mb-12 gap-6 border-b border-gray-100 pb-6 dark:border-gray-800" },
                     React.createElement('div', null,
-                        React.createElement('h2', { className: "text-3xl font-extrabold tracking-tight text-gray-900 mb-2" }, "Our Collection"),
-                        React.createElement('p', { className: "text-base text-gray-500" }, "Curated tools for your everyday life.")
+                        React.createElement('h2', { className: "text-3xl font-extrabold tracking-tight text-gray-900 mb-2 dark:text-white" }, "Our Collection"),
+                        React.createElement('p', { className: "text-base text-gray-500 dark:text-gray-400" }, "Curated tools for your everyday life.")
                     ),
                     React.createElement('div', { className: "flex flex-wrap gap-2" },
                         CATEGORIES.map(cat =>
@@ -535,17 +561,17 @@
                                 className: `px-4 py-2 text-xs font-semibold rounded-full transition-all ${
                                     selectedCategory === cat
                                         ? 'bg-primary-accent text-white shadow-md'
-                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600'
                                 }`
                             }, cat.replace('_', ' '))
                         )
                     )
                 ),
                 filteredProducts.length === 0 ? (
-                    React.createElement('div', { className: "text-center py-24 bg-soft-gray rounded-xl shadow-inner" },
+                    React.createElement('div', { className: "text-center py-24 bg-soft-gray rounded-xl shadow-inner dark:bg-gray-800" },
                         React.createElement(Search, { width: 48, height: 48, className: "mx-auto text-gray-300 mb-4" }),
-                        React.createElement('p', { className: "text-lg font-semibold text-gray-700" }, "No products found."),
-                        React.createElement('p', { className: "text-sm text-gray-500 mt-2" }, "Try adjusting your search or filters."),
+                        React.createElement('p', { className: "text-lg font-semibold text-gray-700 dark:text-gray-300" }, "No products found."),
+                        React.createElement('p', { className: "text-sm text-gray-500 mt-2 dark:text-gray-400" }, "Try adjusting your search or filters."),
                         React.createElement(Button, { variant: "ghost", onClick: () => { setSearchQuery(''); setSelectedCategory('ALL_PRODUCTS'); }, className: "mt-6" }, "Clear Filters")
                     )
                 ) : (
@@ -565,32 +591,50 @@
 
           const ProductDetailView = () => (
             React.createElement('div', { className: "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 animate-fade-in" },
-                React.createElement('div', { className: "mb-6 text-sm text-gray-500" },
+                React.createElement('div', { className: "mb-6 text-sm text-gray-500 dark:text-gray-400" },
                     React.createElement('span', { onClick: () => setView('home'), className: "cursor-pointer hover:text-primary-accent" }, "Home"),
                     React.createElement('span', { className: "mx-2" }, "/"),
                     React.createElement('span', { className: "uppercase" }, activeProduct.category.replace('_', ' ')),
                     React.createElement('span', { className: "mx-2" }, "/"),
-                    React.createElement('span', { className: "text-gray-900 font-medium" }, activeProduct.name)
+                    React.createElement('span', { className: "text-gray-900 font-medium dark:text-white" }, activeProduct.name)
                 ),
                 React.createElement('div', { className: "lg:grid lg:grid-cols-12 lg:gap-16" },
                     React.createElement('div', { className: "lg:col-span-7 flex flex-col gap-4" },
-                        React.createElement('div', { className: "relative aspect-square bg-soft-gray rounded-xl overflow-hidden shadow-lg-soft" },
-                            React.createElement('img', { src: activeProduct.image, alt: activeProduct.name, className: "w-full h-full object-cover object-center" })
+                        React.createElement('div', { className: "relative aspect-square bg-soft-gray rounded-xl overflow-hidden shadow-lg-soft dark:bg-gray-800" },
+                            React.createElement('img', { 
+                                src: activeProduct.image, 
+                                alt: activeProduct.name, 
+                                className: "w-full h-full object-cover object-center",
+                                onError: (e) => { 
+                                    e.target.onerror = null; 
+                                    e.target.src = PLACEHOLDER_URL; 
+                                    e.target.style.filter = "grayscale(100%)";
+                                }
+                            })
                         ),
                         React.createElement('div', { className: "grid grid-cols-4 gap-4" },
                             [1, 2, 3, 4].map(i =>
-                                React.createElement('div', { key: i, className: "aspect-square border-2 border-transparent hover:border-primary-accent transition-colors rounded-lg bg-soft-gray cursor-pointer p-1" },
-                                    React.createElement('img', { src: activeProduct.image, alt: "", className: "w-full h-full object-cover rounded" })
+                                React.createElement('div', { key: i, className: "aspect-square border-2 border-transparent hover:border-primary-accent transition-colors rounded-lg bg-soft-gray cursor-pointer p-1 dark:bg-gray-800" },
+                                    React.createElement('img', { 
+                                        src: activeProduct.image, 
+                                        alt: "", 
+                                        className: "w-full h-full object-cover rounded",
+                                        onError: (e) => { 
+                                            e.target.onerror = null; 
+                                            e.target.src = PLACEHOLDER_URL; 
+                                            e.target.style.filter = "grayscale(100%)";
+                                        }
+                                    })
                                 )
                             )
                         )
                     ),
                     React.createElement('div', { className: "lg:col-span-5 mt-10 lg:mt-0 flex flex-col" },
-                        React.createElement('div', { className: "border-b border-gray-200 pb-4 mb-4" },
-                            React.createElement('h1', { className: "text-4xl font-extrabold tracking-tight text-gray-900 mb-1" }, activeProduct.name),
+                        React.createElement('div', { className: "border-b border-gray-200 pb-4 mb-4 dark:border-gray-700" },
+                            React.createElement('h1', { className: "text-4xl font-extrabold tracking-tight text-gray-900 mb-1 dark:text-white" }, activeProduct.name),
                             React.createElement('div', { className: "flex items-center justify-between" },
                                 React.createElement('span', { className: "text-3xl font-bold text-primary-accent" }, formatCurrency(activeProduct.price)),
-                                React.createElement('div', { className: "flex items-center gap-1 text-sm text-gray-500" },
+                                React.createElement('div', { className: "flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400" },
                                     React.createElement('svg', { xmlns: "http://www.w3.org/2000/svg", width: "16", height: "16", viewBox: "0 0 24 24", fill: "currentColor", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", className: "text-amber-400" },
                                         React.createElement('polygon', { points: "12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" })
                                     ),
@@ -598,14 +642,14 @@
                                 )
                             )
                         ),
-                        React.createElement('div', { className: "text-base text-gray-600 mb-8 leading-relaxed border-l-2 border-primary-accent pl-4 py-2 bg-teal-50/50" },
+                        React.createElement('div', { className: "text-base text-gray-600 mb-8 leading-relaxed border-l-2 border-primary-accent pl-4 py-2 bg-teal-50/50 dark:bg-teal-900/30 dark:text-gray-300" },
                             React.createElement('p', null, activeProduct.description)
                         ),
-                        React.createElement('div', { className: "bg-soft-gray rounded-lg border border-gray-200 p-6 mb-8 shadow-inner" },
-                            React.createElement('h3', { className: "text-sm font-bold uppercase tracking-wider text-gray-700 mb-4" }, "Key Features"),
+                        React.createElement('div', { className: "bg-soft-gray rounded-lg border border-gray-200 p-6 mb-8 shadow-inner dark:bg-gray-800 dark:border-gray-700" },
+                            React.createElement('h3', { className: "text-sm font-bold uppercase tracking-wider text-gray-700 mb-4 dark:text-gray-300" }, "Key Features"),
                             React.createElement('ul', { className: "space-y-3" },
                                 activeProduct.features.map((feature, idx) =>
-                                    React.createElement('li', { key: idx, className: "flex items-center text-base text-gray-700" },
+                                    React.createElement('li', { key: idx, className: "flex items-center text-base text-gray-700 dark:text-gray-300" },
                                         React.createElement(Check, { width: 16, height: 16, className: "text-primary-accent mr-3 flex-shrink-0" }),
                                         feature
                                     )
@@ -619,7 +663,7 @@
                                     React.createElement(Heart, { width: 24, height: 24, fill: "none" })
                                 )
                             ),
-                            React.createElement('p', { className: "text-xs text-center text-gray-500 pt-2" }, "Free shipping & easy 30-day returns.")
+                            React.createElement('p', { className: "text-xs text-center text-gray-500 pt-2 dark:text-gray-400" }, "Free shipping & easy 30-day returns.")
                         )
                     )
                 )
@@ -642,47 +686,56 @@
 
             if (step === 3) {
               return React.createElement('div', { className: "max-w-2xl mx-auto px-4 py-24 text-center animate-fade-in" },
-                React.createElement('div', { className: "inline-block p-4 border-2 border-primary-accent rounded-full mb-6 relative bg-teal-50" },
+                React.createElement('div', { className: "inline-block p-4 border-2 border-primary-accent rounded-full mb-6 relative bg-teal-50 dark:bg-teal-900/50" },
                     React.createElement(Check, { className: "text-primary-accent" })
                 ),
-                React.createElement('h2', { className: "text-3xl font-extrabold text-gray-900 mb-2" }, "Order Confirmed!"),
-                React.createElement('p', { className: "text-gray-600 text-lg mb-4" }, "Thank you for your purchase. Your order has been placed successfully."),
-                React.createElement('p', { className: "text-sm text-gray-500 mb-8" }, `Confirmation ID: #AGT-${Math.floor(Math.random() * 1000000)}`),
+                React.createElement('h2', { className: "text-3xl font-extrabold text-gray-900 mb-2 dark:text-white" }, "Order Confirmed!"),
+                React.createElement('p', { className: "text-gray-600 text-lg mb-4 dark:text-gray-300" }, "Thank you for your purchase. Your order has been placed successfully."),
+                React.createElement('p', { className: "text-sm text-gray-500 mb-8 dark:text-gray-400" }, `Confirmation ID: #AGT-${Math.floor(Math.random() * 1000000)}`),
                 React.createElement(Button, { onClick: () => setView('home') }, "Continue Shopping")
               );
             }
 
             return React.createElement('div', { className: "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12" },
-                React.createElement('h1', { className: "text-3xl font-extrabold border-b-2 border-primary-accent pb-3 mb-10 text-gray-900" }, "Secure Checkout"),
+                React.createElement('h1', { className: "text-3xl font-extrabold border-b-2 border-primary-accent pb-3 mb-10 text-gray-900 dark:text-white dark:border-primary-accent/50" }, "Secure Checkout"),
                 React.createElement('div', { className: "lg:grid lg:grid-cols-12 lg:gap-x-12 lg:items-start" },
-                    React.createElement('div', { className: "lg:col-span-5 lg:col-start-8 mt-10 lg:mt-0 bg-soft-gray rounded-xl border border-gray-200 p-6 shadow-soft order-2 lg:order-1" },
-                        React.createElement('h2', { className: "text-lg font-bold tracking-tight text-gray-900 mb-6 border-b border-gray-200 pb-3" }, "Order Summary"),
+                    React.createElement('div', { className: "lg:col-span-5 lg:col-start-8 mt-10 lg:mt-0 bg-soft-gray rounded-xl border border-gray-200 p-6 shadow-soft order-2 lg:order-1 dark:bg-gray-800 dark:border-gray-700" },
+                        React.createElement('h2', { className: "text-lg font-bold tracking-tight text-gray-900 mb-6 border-b border-gray-200 pb-3 dark:text-white dark:border-gray-700" }, "Order Summary"),
                         React.createElement('div', { className: "flow-root" },
-                            React.createElement('ul', { className: "-my-4 divide-y divide-gray-200" },
+                            React.createElement('ul', { className: "-my-4 divide-y divide-gray-200 dark:divide-gray-700" },
                                 cart.map((product) =>
                                     React.createElement('li', { key: product.id, className: "py-4 flex" },
-                                        React.createElement('div', { className: "flex-shrink-0 w-16 h-16 bg-gray-100 rounded-lg overflow-hidden border border-gray-200" },
-                                            React.createElement('img', { src: product.image, alt: product.name, className: "w-full h-full object-cover" })
+                                        React.createElement('div', { className: "flex-shrink-0 w-16 h-16 bg-gray-100 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-600" },
+                                            React.createElement('img', { 
+                                                src: product.image, 
+                                                alt: product.name, 
+                                                className: "w-full h-full object-cover",
+                                                onError: (e) => { 
+                                                    e.target.onerror = null; 
+                                                    e.target.src = PLACEHOLDER_URL; 
+                                                    e.target.style.filter = "grayscale(100%)";
+                                                }
+                                            })
                                         ),
                                         React.createElement('div', { className: "ml-4 flex-1 flex flex-col justify-center" },
-                                            React.createElement('p', { className: "text-sm font-medium text-gray-900" }, product.name),
-                                            React.createElement('p', { className: "text-xs text-gray-500" }, `Qty: ${product.quantity}`)
+                                            React.createElement('p', { className: "text-sm font-medium text-gray-900 dark:text-white" }, product.name),
+                                            React.createElement('p', { className: "text-xs text-gray-500 dark:text-gray-400" }, `Qty: ${product.quantity}`)
                                         ),
-                                        React.createElement('p', { className: "text-sm font-medium text-gray-900" }, formatCurrency(product.price * product.quantity))
+                                        React.createElement('p', { className: "text-sm font-medium text-gray-900 dark:text-white" }, formatCurrency(product.price * product.quantity))
                                     )
                                 )
                             )
                         ),
-                        React.createElement('div', { className: "border-t border-gray-200 mt-6 pt-6 text-base" },
-                            React.createElement('div', { className: "flex justify-between mb-2 text-gray-600" },
+                        React.createElement('div', { className: "border-t border-gray-200 mt-6 pt-6 text-base dark:border-gray-700" },
+                            React.createElement('div', { className: "flex justify-between mb-2 text-gray-600 dark:text-gray-300" },
                                 React.createElement('p', null, "Subtotal"),
                                 React.createElement('p', null, formatCurrency(cartTotal))
                             ),
-                            React.createElement('div', { className: "flex justify-between mb-4 text-gray-500" },
+                            React.createElement('div', { className: "flex justify-between mb-4 text-gray-500 dark:text-gray-400" },
                                 React.createElement('p', null, "Shipping"),
                                 React.createElement('p', null, "Free")
                             ),
-                            React.createElement('div', { className: "flex justify-between text-xl font-extrabold text-gray-900 border-t border-gray-300 pt-4" },
+                            React.createElement('div', { className: "flex justify-between text-xl font-extrabold text-gray-900 border-t border-gray-300 pt-4 dark:text-white dark:border-gray-600" },
                                 React.createElement('p', null, "Order Total"),
                                 React.createElement('p', null, formatCurrency(cartTotal))
                             )
@@ -691,58 +744,58 @@
                     React.createElement('div', { className: "lg:col-span-7 lg:col-start-1 order-1 lg:order-2" },
                         React.createElement('form', { onSubmit: handlePlaceOrder, className: "space-y-8" },
                             React.createElement('div', { className: "flex items-center space-x-6 text-sm font-semibold uppercase" },
-                                React.createElement('span', { className: `pb-2 border-b-2 ${step === 1 ? 'border-primary-accent text-primary-accent' : 'border-transparent text-gray-500'}` }, "1. Shipping"),
-                                React.createElement('span', { className: `pb-2 border-b-2 ${step === 2 ? 'border-primary-accent text-primary-accent' : 'border-transparent text-gray-500'}` }, "2. Payment")
+                                React.createElement('span', { className: `pb-2 border-b-2 ${step === 1 ? 'border-primary-accent text-primary-accent' : 'border-transparent text-gray-500 dark:text-gray-400'}` }, "1. Shipping"),
+                                React.createElement('span', { className: `pb-2 border-b-2 ${step === 2 ? 'border-primary-accent text-primary-accent' : 'border-transparent text-gray-500 dark:text-gray-400'}` }, "2. Payment")
                             ),
                             step === 1 &&
-                            React.createElement('div', { className: "space-y-6 animate-fade-in bg-white p-6 rounded-xl shadow-md border border-gray-100" },
-                                React.createElement('h3', { className: "text-lg font-semibold text-gray-900 border-b pb-2 mb-4" }, "Shipping Information"),
+                            React.createElement('div', { className: "space-y-6 animate-fade-in bg-white p-6 rounded-xl shadow-md border border-gray-100 dark:bg-gray-800 dark:border-gray-700" },
+                                React.createElement('h3', { className: "text-lg font-semibold text-gray-900 border-b pb-2 mb-4 dark:text-white dark:border-gray-700" }, "Shipping Information"),
                                 React.createElement('div', { className: "grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2" },
                                     React.createElement('div', { className: "sm:col-span-1" },
-                                        React.createElement('label', { className: "block text-xs font-medium text-gray-700 mb-1" }, "First Name"),
-                                        React.createElement('input', { type: "text", required: true, className: "block w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:border-primary-accent focus:ring-primary-accent/50 transition-colors" })
+                                        React.createElement('label', { className: "block text-xs font-medium text-gray-700 mb-1 dark:text-gray-300" }, "First Name"),
+                                        React.createElement('input', { type: "text", required: true, className: "block w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:border-primary-accent focus:ring-primary-accent/50 transition-colors dark:bg-gray-700 dark:border-gray-600 dark:text-white" })
                                     ),
                                     React.createElement('div', { className: "sm:col-span-1" },
-                                        React.createElement('label', { className: "block text-xs font-medium text-gray-700 mb-1" }, "Last Name"),
-                                        React.createElement('input', { type: "text", required: true, className: "block w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:border-primary-accent focus:ring-primary-accent/50 transition-colors" })
+                                        React.createElement('label', { className: "block text-xs font-medium text-gray-700 mb-1 dark:text-gray-300" }, "Last Name"),
+                                        React.createElement('input', { type: "text", required: true, className: "block w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:border-primary-accent focus:ring-primary-accent/50 transition-colors dark:bg-gray-700 dark:border-gray-600 dark:text-white" })
                                     ),
                                     React.createElement('div', { className: "sm:col-span-2" },
-                                        React.createElement('label', { className: "block text-xs font-medium text-gray-700 mb-1" }, "Address Line 1"),
-                                        React.createElement('input', { type: "text", required: true, className: "block w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:border-primary-accent focus:ring-primary-accent/50 transition-colors" })
+                                        React.createElement('label', { className: "block text-xs font-medium text-gray-700 mb-1 dark:text-gray-300" }, "Address Line 1"),
+                                        React.createElement('input', { type: "text", required: true, className: "block w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:border-primary-accent focus:ring-primary-accent/50 transition-colors dark:bg-gray-700 dark:border-gray-600 dark:text-white" })
                                     ),
                                     React.createElement('div', { className: "sm:col-span-1" },
-                                        React.createElement('label', { className: "block text-xs font-medium text-gray-700 mb-1" }, "City"),
-                                        React.createElement('input', { type: "text", required: true, className: "block w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:border-primary-accent focus:ring-primary-accent/50 transition-colors" })
+                                        React.createElement('label', { className: "block text-xs font-medium text-gray-700 mb-1 dark:text-gray-300" }, "City"),
+                                        React.createElement('input', { type: "text", required: true, className: "block w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:border-primary-accent focus:ring-primary-accent/50 transition-colors dark:bg-gray-700 dark:border-gray-600 dark:text-white" })
                                     ),
                                     React.createElement('div', { className: "sm:col-span-1" },
-                                        React.createElement('label', { className: "block text-xs font-medium text-gray-700 mb-1" }, "Postal Code"),
-                                        React.createElement('input', { type: "text", required: true, className: "block w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:border-primary-accent focus:ring-primary-accent/50 transition-colors" })
+                                        React.createElement('label', { className: "block text-xs font-medium text-gray-700 mb-1 dark:text-gray-300" }, "Postal Code"),
+                                        React.createElement('input', { type: "text", required: true, className: "block w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:border-primary-accent focus:ring-primary-accent/50 transition-colors dark:bg-gray-700 dark:border-gray-600 dark:text-white" })
                                     )
                                 ),
                                 React.createElement(Button, { type: "button", onClick: () => setStep(2), className: "w-full mt-6 py-3" }, "Continue to Payment")
                             ),
                             step === 2 &&
-                            React.createElement('div', { className: "space-y-6 animate-fade-in bg-white p-6 rounded-xl shadow-md border border-gray-100" },
-                                React.createElement('h3', { className: "text-lg font-semibold text-gray-900 border-b pb-2 mb-4" }, "Payment Method"),
-                                React.createElement('div', { className: "bg-teal-50 border border-primary-accent/50 rounded-lg p-4 flex items-center justify-between" },
+                            React.createElement('div', { className: "space-y-6 animate-fade-in bg-white p-6 rounded-xl shadow-md border border-gray-100 dark:bg-gray-800 dark:border-gray-700" },
+                                React.createElement('h3', { className: "text-lg font-semibold text-gray-900 border-b pb-2 mb-4 dark:text-white dark:border-gray-700" }, "Payment Method"),
+                                React.createElement('div', { className: "bg-teal-50 border border-primary-accent/50 rounded-lg p-4 flex items-center justify-between dark:bg-teal-900/50" },
                                     React.createElement('div', { className: "flex items-center gap-3" },
                                         React.createElement(CreditCard, { className: "text-primary-accent" }),
-                                        React.createElement('span', { className: "text-sm font-semibold text-gray-800" }, "Credit Card")
+                                        React.createElement('span', { className: "text-sm font-semibold text-gray-800 dark:text-gray-200" }, "Credit Card")
                                     )
                                 ),
                                 React.createElement('div', { className: "space-y-4" },
                                     React.createElement('div', null,
-                                        React.createElement('label', { className: "block text-xs font-medium text-gray-700 mb-1" }, "Card Number"),
-                                        React.createElement('input', { type: "text", placeholder: "XXXX XXXX XXXX XXXX", required: true, className: "block w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:border-primary-accent focus:ring-primary-accent/50 transition-colors" })
+                                        React.createElement('label', { className: "block text-xs font-medium text-gray-700 mb-1 dark:text-gray-300" }, "Card Number"),
+                                        React.createElement('input', { type: "text", placeholder: "XXXX XXXX XXXX XXXX", required: true, className: "block w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:border-primary-accent focus:ring-primary-accent/50 transition-colors dark:bg-gray-700 dark:border-gray-600 dark:text-white" })
                                     ),
                                     React.createElement('div', { className: "grid grid-cols-2 gap-4" },
                                         React.createElement('div', null,
-                                            React.createElement('label', { className: "block text-xs font-medium text-gray-700 mb-1" }, "Expiration Date"),
-                                            React.createElement('input', { type: "text", placeholder: "MM/YY", required: true, className: "block w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:border-primary-accent focus:ring-primary-accent/50 transition-colors" })
+                                            React.createElement('label', { className: "block text-xs font-medium text-gray-700 mb-1 dark:text-gray-300" }, "Expiration Date"),
+                                            React.createElement('input', { type: "text", placeholder: "MM/YY", required: true, className: "block w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:border-primary-accent focus:ring-primary-accent/50 transition-colors dark:bg-gray-700 dark:border-gray-600 dark:text-white" })
                                         ),
                                         React.createElement('div', null,
-                                            React.createElement('label', { className: "block text-xs font-medium text-gray-700 mb-1" }, "CVC"),
-                                            React.createElement('input', { type: "text", placeholder: "CVC", required: true, className: "block w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:border-primary-accent focus:ring-primary-accent/50 transition-colors" })
+                                            React.createElement('label', { className: "block text-xs font-medium text-gray-700 mb-1 dark:text-gray-300" }, "CVC"),
+                                            React.createElement('input', { type: "text", placeholder: "CVC", required: true, className: "block w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:border-primary-accent focus:ring-primary-accent/50 transition-colors dark:bg-gray-700 dark:border-gray-600 dark:text-white" })
                                         )
                                     )
                                 ),
@@ -804,29 +857,29 @@
           );
 
           const AboutView = () => (
-            React.createElement('div', { className: "max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 animate-fade-in text-gray-800" },
+            React.createElement('div', { className: "max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 animate-fade-in text-gray-800 dark:text-gray-200" },
                 React.createElement('h1', { className: "text-4xl font-extrabold text-primary-accent mb-6" }, "About Agate Industries"),
                 React.createElement('p', { className: "text-xl mb-8" }, "We engineer the future, one elegant product at a time. Agate Industries is dedicated to fusing minimalist design with maximum performance."),
                 React.createElement('div', { className: "space-y-10" },
                     React.createElement('div', null,
-                        React.createElement('h2', { className: "text-2xl font-bold mb-3" }, "Our Philosophy: Durability & Design"),
+                        React.createElement('h2', { className: "text-2xl font-bold mb-3 dark:text-white" }, "Our Philosophy: Durability & Design"),
                         React.createElement('p', { className: "text-lg leading-relaxed" }, "Every item in our collection is subjected to rigorous testing to ensure it withstands the demands of modern life. We believe technology should integrate seamlessly, disappearing into the background until its performance is called upon. From the Quantum X headphones to the Velocity Shell apparel, our focus is on materials science, intuitive ergonomics, and longevity.")
                     ),
-                    React.createElement('div', { className: "grid grid-cols-1 md:grid-cols-3 gap-8 text-center pt-4 border-t border-gray-100" },
-                        React.createElement('div', { className: "p-4 bg-soft-gray rounded-xl shadow-soft" },
+                    React.createElement('div', { className: "grid grid-cols-1 md:grid-cols-3 gap-8 text-center pt-4 border-t border-gray-100 dark:border-gray-700" },
+                        React.createElement('div', { className: "p-4 bg-soft-gray rounded-xl shadow-soft dark:bg-gray-800" },
                             React.createElement(ShoppingBag, { className: "w-8 h-8 mx-auto text-primary-accent mb-2" }),
-                            React.createElement('p', { className: "font-semibold" }, "Sustainable Sourcing"),
-                            React.createElement('p', { className: "text-sm text-gray-600" }, "Committed to ethical material chains.")
+                            React.createElement('p', { className: "font-semibold dark:text-white" }, "Sustainable Sourcing"),
+                            React.createElement('p', { className: "text-sm text-gray-600 dark:text-gray-400" }, "Committed to ethical material chains.")
                         ),
-                        React.createElement('div', { className: "p-4 bg-soft-gray rounded-xl shadow-soft" },
+                        React.createElement('div', { className: "p-4 bg-soft-gray rounded-xl shadow-soft dark:bg-gray-800" },
                             React.createElement(Check, { className: "w-8 h-8 mx-auto text-primary-accent mb-2" }),
-                            React.createElement('p', { className: "font-semibold" }, "Lifetime Guarantee"),
-                            React.createElement('p', { className: "text-sm text-gray-600" }, "Confidence in every product we ship.")
+                            React.createElement('p', { className: "font-semibold dark:text-white" }, "Lifetime Guarantee"),
+                            React.createElement('p', { className: "text-sm text-gray-600 dark:text-gray-400" }, "Confidence in every product we ship.")
                         ),
-                        React.createElement('div', { className: "p-4 bg-soft-gray rounded-xl shadow-soft" },
+                        React.createElement('div', { className: "p-4 bg-soft-gray rounded-xl shadow-soft dark:bg-gray-800" },
                             React.createElement(Heart, { className: "w-8 h-8 mx-auto text-primary-accent mb-2" }),
-                            React.createElement('p', { className: "font-semibold" }, "Community Focused"),
-                            React.createElement('p', { className: "text-sm text-gray-600" }, "Supporting creators and innovators globally.")
+                            React.createElement('p', { className: "font-semibold dark:text-white" }, "Community Focused"),
+                            React.createElement('p', { className: "text-sm text-gray-600 dark:text-gray-400" }, "Supporting creators and innovators globally.")
                         )
                     )
                 ),
